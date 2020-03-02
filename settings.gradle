@@ -1,0 +1,2 @@
+include ':app', ':multistreamplayer'
+rootProject.name='LiveStreamVideoPlayer'
