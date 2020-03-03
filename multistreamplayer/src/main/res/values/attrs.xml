@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MultiStreamPlayerLayout">
+        <attr name="playerType" format="integer">
+            <enum name="livestream" value="1"/>
+            <enum name="video" value="2"/>
+        </attr>
+    </declare-styleable>
+</resources>
