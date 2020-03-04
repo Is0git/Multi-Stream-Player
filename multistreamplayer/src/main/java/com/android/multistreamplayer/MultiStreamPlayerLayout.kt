@@ -2,11 +2,10 @@ package com.android.multistreamplayer
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.LinearLayout
+import android.widget.ScrollView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -32,9 +31,10 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
     lateinit var multiStreamPlayer: MultiStreamPlayer
 
     private var playerView: PlayerView? = null
-    private var settingsIconView: ImageView? = null
 
     private var settings: SettingsLayout? = null
+    private var settingsScrollView: ScrollView? = null
+    private var settingsIconView: ImageButton? = null
     private var settingsExpandAnimation: ExpandAnimation? = null
 
     private var playerType: Int = LIVE_STREAM
@@ -50,24 +50,27 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         }
     }
 
-    override fun onViewAdded(view: View?) {
-        super.onViewAdded(view)
-        if (view?.id == R.id.player) {
-            playerView = findViewById(R.id.player)
-            settingsIconView = playerView!!.findViewById<ImageButton>(R.id.settings_icon)
-            playerView?.player = multiStreamPlayer.player.apply {
-            }
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        allocateViews()
+    }
+
+
+    private fun allocateViews() {
+        playerView = findViewById(R.id.player)
+
+        playerView?.player = multiStreamPlayer.player.apply {
+
         }
-        else if(view?.id == R.id.settings) {
-            settings = view as SettingsLayout
-            settingsExpandAnimation = ExpandAnimation(context, R.transition.expand_transition).also { settings?.expandAnimation = it }
-            settingsIconView?.setOnClickListener {
-                settingsExpandAnimation?.playAnimation(settings, rootView =  this)
-            }
-            settings?.backButton?.setOnClickListener {
-                settingsExpandAnimation?.playAnimation(settings, rootView =  this)
-            }
-        }
+
+        settingsScrollView = findViewById(R.id.settings_scroll_view)
+        settings = settingsScrollView?.findViewById(R.id.settings)
+        settingsIconView = playerView?.findViewById(R.id.settings_icon)
+
+        settingsExpandAnimation = ExpandAnimation(context, R.transition.expand_transition).also { settings?.expandAnimation = it }
+
+        settingsIconView?.setOnClickListener { settingsExpandAnimation?.playAnimation(settingsScrollView, rootView = this) }
+        settings?.backButton?.setOnClickListener { settingsExpandAnimation?.playAnimation(settingsScrollView, rootView = this) }
     }
 
 

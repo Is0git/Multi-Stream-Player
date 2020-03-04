@@ -1,8 +1,11 @@
 package com.android.livestreamvideoplayer
 
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +22,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initService()
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        (binding.root as MultiStreamPlayerLayout)
+
         getUrl()
 
     }

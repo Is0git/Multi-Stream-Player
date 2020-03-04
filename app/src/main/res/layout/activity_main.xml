@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.android.multistreamplayer.MultiStreamPlayerLayout
         android:layout_width="match_parent"
-        android:background="#B9B9B9"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#B9B9B9">
+
         <com.google.android.exoplayer2.ui.PlayerView
             android:id="@+id/player"
             android:layout_width="match_parent"
@@ -15,12 +16,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.android.multistreamplayer.settings.SettingsLayout
-            android:id="@+id/settings"
+        <ScrollView
+            android:id="@+id/settings_scroll_view"
             android:layout_width="match_parent"
-            android:background="?colorSurface"
             android:layout_height="0dp"
+            android:background="?colorSurface"
             android:visibility="invisible"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <com.android.multistreamplayer.settings.SettingsLayout
+                android:id="@+id/settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </ScrollView>
     </com.android.multistreamplayer.MultiStreamPlayerLayout>
 </layout>
