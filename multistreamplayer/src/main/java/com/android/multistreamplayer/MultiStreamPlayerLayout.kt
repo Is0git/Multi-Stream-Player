@@ -2,7 +2,9 @@ package com.android.multistreamplayer
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Lifecycle
@@ -29,6 +31,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
     private var playerView: PlayerView? = null
     private var playerType: Int = LIVE_STREAM
 
+
     private fun init(context: Context?, attrs: AttributeSet? = null) {
         context?.obtainStyledAttributes(attrs, R.styleable.MultiStreamPlayerLayout)?.apply {
             playerType = getInt(R.styleable.MultiStreamPlayerLayout_playerType, LIVE_STREAM).also { multiStreamPlayer = MultiStreamPlayer(context, it) }
@@ -40,10 +43,12 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         super.onViewAdded(view)
         if (view?.id == R.id.player) {
             playerView = findViewById(R.id.player)
-            playerView?.player = multiStreamPlayer.player
+            playerView!!.findViewById<ImageButton>(R.id.settings_icon).setOnClickListener {
+                Log.d("PALYER", "SETTIGNS CLICKED")
+            }
+            playerView?.player = multiStreamPlayer.player }
         }
 
-    }
     fun play(uri: String) {
         multiStreamPlayer.play(uri)
     }
