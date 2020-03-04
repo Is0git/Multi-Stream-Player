@@ -5,12 +5,14 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
-import androidx.appcompat.app.AppCompatActivity
+import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.android.multistreamplayer.MultiStreamPlayer.Companion.LIVE_STREAM
+import com.android.multistreamplayer.settings.animations.ExpandAnimation
 import com.google.android.exoplayer2.ui.PlayerView
 
 class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
@@ -29,25 +31,41 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
     lateinit var multiStreamPlayer: MultiStreamPlayer
 
     private var playerView: PlayerView? = null
+    private var settingsIconView: ImageView? = null
+
+    private var settings: LinearLayout? = null
+    private var settingsExpandAnimation: ExpandAnimation? = null
+
     private var playerType: Int = LIVE_STREAM
 
 
     private fun init(context: Context?, attrs: AttributeSet? = null) {
         context?.obtainStyledAttributes(attrs, R.styleable.MultiStreamPlayerLayout)?.apply {
-            playerType = getInt(R.styleable.MultiStreamPlayerLayout_playerType, LIVE_STREAM).also { multiStreamPlayer = MultiStreamPlayer(context, it) }
+            playerType = getInt(
+                R.styleable.MultiStreamPlayerLayout_playerType,
+                LIVE_STREAM
+            ).also { multiStreamPlayer = MultiStreamPlayer(context, it) }
             recycle()
         }
-        }
+    }
 
     override fun onViewAdded(view: View?) {
         super.onViewAdded(view)
         if (view?.id == R.id.player) {
             playerView = findViewById(R.id.player)
-            playerView!!.findViewById<ImageButton>(R.id.settings_icon).setOnClickListener {
-                Log.d("PALYER", "SETTIGNS CLICKED")
+            settingsIconView = playerView!!.findViewById<ImageButton>(R.id.settings_icon)
+            playerView?.player = multiStreamPlayer.player.apply {
             }
-            playerView?.player = multiStreamPlayer.player }
         }
+        else if(view?.id == R.id.settings) {
+            settings = view as LinearLayout
+            settingsExpandAnimation = ExpandAnimation(context, R.transition.expand_transition)
+            settingsIconView?.setOnClickListener {
+                settingsExpandAnimation?.playAnimation(settings, rootView =  this)
+            }
+        }
+    }
+
 
     fun play(uri: String) {
         multiStreamPlayer.play(uri)
@@ -65,7 +83,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() {
-            release()
+        release()
     }
 
     private fun release() {

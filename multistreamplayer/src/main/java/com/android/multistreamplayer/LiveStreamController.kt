@@ -27,7 +27,7 @@ class LiveStreamController(ctx: Context, player: SimpleExoPlayer) : MultiStreamC
 //                }
 //            }
 
-                    Log.d("PALYER", "TRACKS: ${player.currentTrackSelections.get(0)?.selectedFormat?.frameRate}")
+                    player.currentTrackSelections
         }
     }
 }
