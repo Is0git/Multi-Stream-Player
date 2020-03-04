@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             val uri = Uri.Builder()
                 .scheme("http")
                 .authority("usher.twitch.tv")
-                .encodedPath("api/channel/hls/trainwreckstv.m3u8")
+                .encodedPath("api/channel/hls/healthygamer_gg.m3u8")
                 .encodedQuery("token=${response.body()?.token}" )
                 .appendQueryParameter("sig", response.body()?.sig)
                 .appendQueryParameter("player", "twitchweb")

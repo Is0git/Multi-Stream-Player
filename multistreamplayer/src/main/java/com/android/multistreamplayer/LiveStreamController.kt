@@ -15,20 +15,5 @@ class LiveStreamController(ctx: Context, player: SimpleExoPlayer) : MultiStreamC
         dataSourceFactory: DefaultDataSourceFactory,
         url: Uri
     ): MediaSource = HlsMediaSource.Factory(dataSourceFactory).createMediaSource(url)
-
-
-
-    override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        super.onPlayerStateChanged(playWhenReady, playbackState)
-        if (playbackState == STATE_READY) {
-//            for(a in 0 until player.currentTrackSelections.length) {
-//                for (b in 0 until player.currentTrackSelections[a]?.length!!) {
-//                    Log.d("PALYER", "TRACKS: ${player.currentTrackSelections[a]?.getFormat(b)?.frameRate}")
-//                }
-//            }
-
-                    player.currentTrackSelections
-        }
-    }
 }
 

@@ -2,17 +2,17 @@ package com.android.multistreamplayer
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.ScrollView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.android.multistreamplayer.MultiStreamPlayer.Companion.LIVE_STREAM
+import com.android.multistreamplayer.settings.ResourceListener
 import com.android.multistreamplayer.settings.SettingsLayout
 import com.android.multistreamplayer.settings.animations.ExpandAnimation
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.PlayerView
 
 class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
@@ -38,13 +38,21 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
 
     private var playerType: Int = LIVE_STREAM
 
-
     private fun init(context: Context?, attrs: AttributeSet? = null) {
         context?.obtainStyledAttributes(attrs, R.styleable.MultiStreamPlayerLayout)?.apply {
             playerType = getInt(
                 R.styleable.MultiStreamPlayerLayout_playerType,
                 LIVE_STREAM
-            ).also { multiStreamPlayer = MultiStreamPlayer(context, it) }
+            ).also {
+                multiStreamPlayer = MultiStreamPlayer(context, it)
+                addOnResourceReadyListener(object : ResourceListener {
+                    override fun onResourceTracksReady(player: TrackSelectionArray) {
+                        SettingsLayout.Group.Builder()
+                            .addHeader("QUALITY")
+                    }
+
+                })
+            }
             recycle()
         }
     }
@@ -72,6 +80,10 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         settings?.backButton?.setOnClickListener { settingsExpandAnimation?.playAnimation(settingsScrollView, rootView = this) }
     }
 
+
+    fun addOnResourceReadyListener(listener: ResourceListener) {
+        multiStreamPlayer.controller?.listeners?.add(listener)
+    }
 
     fun play(uri: String) {
         multiStreamPlayer.play(uri)

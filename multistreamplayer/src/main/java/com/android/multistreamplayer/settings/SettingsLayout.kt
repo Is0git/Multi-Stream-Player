@@ -21,6 +21,7 @@ import com.google.android.material.shape.CornerFamily.ROUNDED
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.textview.MaterialTextView
 import de.hdodenhof.circleimageview.CircleImageView
+import java.util.*
 
 class SettingsLayout : LinearLayout {
     constructor(context: Context?) : super(context) {
@@ -85,7 +86,7 @@ class SettingsLayout : LinearLayout {
         addView(backButton)
     }
 
-    private fun addHeader(headerName: String) {
+    fun addHeader(headerName: String) {
         val view = MaterialTextView(context, null, R.attr.textAppearanceHeadline3  ).apply {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
                 marginStart = marginStartGuideline
@@ -97,7 +98,7 @@ class SettingsLayout : LinearLayout {
         addView(view)
     }
 
-    private fun addComponentName(componentName: String) {
+    fun addComponentName(componentName: String) {
         val view = MaterialTextView(context, null, R.attr.textAppearanceHeadline5  ).apply {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
                 marginStart = marginStartGuideline
@@ -109,7 +110,7 @@ class SettingsLayout : LinearLayout {
         addView(view)
     }
 
-    private fun addItemCard(cardType: Int = MIDDLE_CARD) {
+    fun addItemCard(cardType: Int = MIDDLE_CARD) {
 
         var topLeftCornerRadius = 0f
         var topRightCornerRadius = 0f
@@ -191,4 +192,41 @@ class SettingsLayout : LinearLayout {
         }
     }
 
+
+    data class Group(val headerText: String, val imageId: Int, var topText: String, var bottomText: String) {
+
+        class Builder() {
+            var headerText: String? = null
+            var imageId: Int? = null
+            var topText: String? = null
+            var bottomText: String? = null
+            fun build(): Group {
+                val headerText = this.headerText ?: "GROUP"
+                val bottomText = this.bottomText ?: "BottomText"
+                val topText = this.topText ?: "TopText"
+                val imageId = this.imageId ?: R.id.itemImage
+                return Group(headerText, imageId, bottomText, topText)
+            }
+
+            fun addHeader(headerText: String): Builder {
+                this.headerText = headerText.toUpperCase(Locale.getDefault())
+                return this
+            }
+
+            fun addTopText(topText: String): Builder {
+                this.topText = topText.toUpperCase(Locale.getDefault())
+                return this
+            }
+
+            fun addBottomText(bottomText: String): Builder {
+                this.bottomText = bottomText
+                return this
+            }
+
+            fun setImageId(imageId: Int): Builder {
+                this.imageId = imageId
+                return this
+            }
+        }
+    }
 }

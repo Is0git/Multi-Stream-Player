@@ -10,7 +10,7 @@ interface VideoService {
         "Accept: application/vnd.twitchtv.v5+json"
     )
     @GET
-    suspend fun getAccessToken(@Url url: String = "https://api.twitch.tv/api/channels/trainwreckstv/access_token"): Response<Token>
+    suspend fun getAccessToken(@Url url: String = "https://api.twitch.tv/api/channels/healthygamer_gg/access_token"): Response<Token>
 
     @Headers(
         "Client-Id: kimne78kx3ncx6brgo4mv6wki5h1ko",
