@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.android.livestreamvideoplayer.databinding.ActivityMainBinding
+import com.android.multistreamplayer.MultiStreamPlayerLayout
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding

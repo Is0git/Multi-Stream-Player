@@ -1,6 +1,5 @@
-package com.android.livestreamvideoplayer
+package com.android.multistreamplayer
 
-import android.app.Activity
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -9,14 +8,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.android.multistreamplayer.LiveStreamController
-import com.android.multistreamplayer.MultiStreamPlayer
 import com.android.multistreamplayer.MultiStreamPlayer.Companion.LIVE_STREAM
-import com.android.multistreamplayer.VideoController
-import com.google.android.exoplayer2.ExoPlayerFactory
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.ui.PlayerView
-import kotlinx.android.synthetic.main.activity_main.view.*
 
 class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
     constructor(context: Context?) : super(context)
@@ -37,11 +30,10 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
     private var playerType: Int = LIVE_STREAM
 
     private fun init(context: Context?, attrs: AttributeSet? = null) {
-        (context as AppCompatActivity).lifecycle.addObserver(this)
-        context.obtainStyledAttributes(attrs, R.styleable.MultiStreamPlayerLayout)?.apply {
+        context?.obtainStyledAttributes(attrs, R.styleable.MultiStreamPlayerLayout)?.apply {
             playerType = getInt(R.styleable.MultiStreamPlayerLayout_playerType, LIVE_STREAM).also { multiStreamPlayer = MultiStreamPlayer(context, it) }
             recycle()
-            }
+        }
         }
 
     override fun onViewAdded(view: View?) {
@@ -56,8 +48,22 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         multiStreamPlayer.play(uri)
     }
 
+
+    fun registerLifeCycle(lifecycle: Lifecycle) {
+        lifecycle.addObserver(this)
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onStop() {
+        release()
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroy() {
+            release()
+    }
+
+    private fun release() {
         playerView?.player?.apply {
             stop()
             release()
