@@ -11,36 +11,39 @@ class ExpandAnimation(context: Context, transitionId: Int) {
 
     var transition = TransitionInflater.from(context).inflateTransition(transitionId)
 
+    var isExpanded: Boolean = false
+
     fun playAnimation(vararg view: View?, rootView: ConstraintLayout) {
 
         TransitionManager.beginDelayedTransition(rootView, transition)
             view.forEach {
-                if (it?.visibility == View.INVISIBLE) expand(it) else hide(it)
+                if (isExpanded) hide(it) else expand(it)
             }
     }
 
     private fun expand(view: View?) {
         view?.apply {
-            visibility = View.VISIBLE
+            isExpanded = true
            layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_CONSTRAINT).apply {
                 this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
                 this.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                 this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
                 this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
             }
+            visibility = View.VISIBLE
         }
 
     }
 
     private fun hide(view: View?) {
         view?.apply {
+            isExpanded = false
             layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, 0).apply {
-                this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                this.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                this.topToBottom = ConstraintLayout.LayoutParams.PARENT_ID
                 this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
                 this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
             }
-            visibility = View.VISIBLE
+
         }
 
     }

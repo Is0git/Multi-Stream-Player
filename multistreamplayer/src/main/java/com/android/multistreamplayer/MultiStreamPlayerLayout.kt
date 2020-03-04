@@ -12,6 +12,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.android.multistreamplayer.MultiStreamPlayer.Companion.LIVE_STREAM
+import com.android.multistreamplayer.settings.SettingsLayout
 import com.android.multistreamplayer.settings.animations.ExpandAnimation
 import com.google.android.exoplayer2.ui.PlayerView
 
@@ -33,7 +34,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
     private var playerView: PlayerView? = null
     private var settingsIconView: ImageView? = null
 
-    private var settings: LinearLayout? = null
+    private var settings: SettingsLayout? = null
     private var settingsExpandAnimation: ExpandAnimation? = null
 
     private var playerType: Int = LIVE_STREAM
@@ -58,9 +59,12 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
             }
         }
         else if(view?.id == R.id.settings) {
-            settings = view as LinearLayout
-            settingsExpandAnimation = ExpandAnimation(context, R.transition.expand_transition)
+            settings = view as SettingsLayout
+            settingsExpandAnimation = ExpandAnimation(context, R.transition.expand_transition).also { settings?.expandAnimation = it }
             settingsIconView?.setOnClickListener {
+                settingsExpandAnimation?.playAnimation(settings, rootView =  this)
+            }
+            settings?.backButton?.setOnClickListener {
                 settingsExpandAnimation?.playAnimation(settings, rootView =  this)
             }
         }

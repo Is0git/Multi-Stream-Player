@@ -2,4 +2,5 @@
 <resources>
     <item name="player" type="id"/>
     <item name="settings" type="id"/>
+    <item name="back_button" type="id"/>
 </resources>
