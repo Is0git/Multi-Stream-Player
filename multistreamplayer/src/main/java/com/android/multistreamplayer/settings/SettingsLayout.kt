@@ -1,12 +1,14 @@
 package com.android.multistreamplayer.settings
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
@@ -151,6 +153,7 @@ class SettingsLayout : LinearLayout {
                 circleImage.id = R.id.itemImage
                 circleImage.borderWidth = 2
                 circleImage.borderColor = Color.parseColor("#000000")
+                circleImage.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.full_hd_icon, context?.theme))
             }
 
             val textOne = MaterialTextView(context, null, R.attr.textAppearanceBody1).apply {
@@ -164,11 +167,19 @@ class SettingsLayout : LinearLayout {
                 text = "TEXTONE"
             }
 
+            val selectionIcon = ImageView(context).apply {
+                id = R.id.selectionIcon
+                scaleType = ImageView.ScaleType.FIT_CENTER
+                imageTintList = ColorStateList.valueOf(Color.GREEN)
+                setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.selection_icon, context?.theme))
+            }
+
             setConstraintSet(ConstraintSet().also { it.clone(context, R.layout.settings_item_layout) })
 
             addView(itemImage)
             addView(textOne)
             addView(textTwo)
+            addView(selectionIcon)
         }
         card.addView(constraintLayout)
         addView(card)

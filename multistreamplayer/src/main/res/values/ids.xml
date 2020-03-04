@@ -9,4 +9,5 @@
     <item name="textOne" type="id"/>
     <item name="textTwo" type="id"/>
     <item name="textThree" type="id"/>
+    <item name="selectionIcon" type="id"/>
 </resources>
