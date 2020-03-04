@@ -27,7 +27,6 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         defStyleAttr
     )
 
-
     lateinit var multiStreamPlayer: MultiStreamPlayer
 
     private var playerView: PlayerView? = null

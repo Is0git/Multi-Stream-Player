@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="topItemShape" parent="">
+        <item name="android:topRightRadius">10dp</item>
+        <item name="android:topLeftRadius">10dp</item>
+        <item name="android:bottomLeftRadius">0dp</item>
+        <item name="android:bottomRightRadius">0dp</item>
+
+    </style>
+</resources>
