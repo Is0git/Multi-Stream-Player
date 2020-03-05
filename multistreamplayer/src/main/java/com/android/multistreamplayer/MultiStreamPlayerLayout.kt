@@ -47,10 +47,22 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
                 multiStreamPlayer = MultiStreamPlayer(context, it)
                 addOnResourceReadyListener(object : ResourceListener {
                     override fun onResourceTracksReady(player: TrackSelectionArray) {
-                        SettingsLayout.Group.Builder()
-                            .addHeader("QUALITY")
-                    }
+                        val size = player[0]?.length() ?: 0
+                        val groupItemsArray = Array<SettingsLayout.Group.GroupItem?>(size) {null}
 
+                        for (i in 0 until size) {
+                            groupItemsArray[i] = player[0]?.getFormat(i).let { format ->
+                                SettingsLayout.Group.GroupItem("${format?.height}P", "${format?.bitrate}", R.drawable.full_hd_icon)
+                            }
+                        }
+
+                       val group = SettingsLayout.Group.Builder(context)
+                            .addHeader("QUALITY")
+                            .addItems(groupItemsArray)
+                            .build()
+
+                        addSettingsGroup(group)
+                    }
                 })
             }
             recycle()
@@ -89,6 +101,9 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         multiStreamPlayer.play(uri)
     }
 
+    fun addSettingsGroup(group: SettingsLayout.Group) {
+        settings?.addGroup(group)
+    }
 
     fun registerLifeCycle(lifecycle: Lifecycle) {
         lifecycle.addObserver(this)
