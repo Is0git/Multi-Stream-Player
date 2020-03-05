@@ -22,6 +22,7 @@ import com.google.android.material.shape.CornerFamily.ROUNDED
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.textview.MaterialTextView
 import de.hdodenhof.circleimageview.CircleImageView
+import java.lang.IllegalStateException
 import java.lang.NullPointerException
 import java.util.*
 
@@ -47,6 +48,7 @@ class SettingsLayout : LinearLayout {
         const val MIDDLE_CARD = 1
         const val BOTTOM_CARD = 2
     }
+    val groups: MutableMap<String, Group> by lazy { mutableMapOf<String, Group>() }
 
     val marginStartGuideline = ScreenUnit.convertDpToPixel(32f, context).toInt()
     val componentMargin = ScreenUnit.convertDpToPixel(32f, context).toInt()
@@ -96,6 +98,7 @@ class SettingsLayout : LinearLayout {
         group.items?.forEach {
             addView(it)
         }
+        groups[group.headerText.text.toString()] = group
     }
     override fun onViewAdded(child: View?) {
         if (child?.id == R.id.back_button) {
@@ -135,6 +138,7 @@ class SettingsLayout : LinearLayout {
             }
 
             fun addHeader(headerText: String): Builder {
+                if (headerText.isBlank()) throw IllegalStateException("header text cannot be empty")
                 this.headerText = headerText.toUpperCase(Locale.getDefault())
                 return this
             }

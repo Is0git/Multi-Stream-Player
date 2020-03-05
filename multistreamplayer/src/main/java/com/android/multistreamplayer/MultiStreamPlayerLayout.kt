@@ -47,6 +47,8 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
                 multiStreamPlayer = MultiStreamPlayer(context, it)
                 addOnResourceReadyListener(object : ResourceListener {
                     override fun onResourceTracksReady(player: TrackSelectionArray) {
+                        val qualityHeader: String = context.getString(R.string.quality)
+                        if (settings == null || settings?.groups?.get(qualityHeader) != null) return
                         val size = player[0]?.length() ?: 0
                         val groupItemsArray = Array<SettingsLayout.Group.GroupItem?>(size) {null}
 
@@ -57,7 +59,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
                         }
 
                        val group = SettingsLayout.Group.Builder(context)
-                            .addHeader("QUALITY")
+                            .addHeader(qualityHeader)
                             .addItems(groupItemsArray)
                             .build()
 

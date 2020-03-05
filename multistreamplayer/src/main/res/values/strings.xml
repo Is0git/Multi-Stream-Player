@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MultiStreamPlayer</string>
+    <string name="quality">QUALITY</string>
 </resources>
