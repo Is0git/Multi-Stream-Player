@@ -13,6 +13,8 @@ import com.android.multistreamplayer.MultiStreamPlayer.Companion.LIVE_STREAM
 import com.android.multistreamplayer.settings.ResourceListener
 import com.android.multistreamplayer.settings.SettingsLayout
 import com.android.multistreamplayer.settings.animations.ExpandAnimation
+import com.android.multistreamplayer.settings.groups.SelectionGroup
+import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.PlayerView
@@ -47,27 +49,30 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
                 LIVE_STREAM
             ).also { playerType -> multiStreamPlayer = MultiStreamPlayer(context, playerType)}
                 addOnResourceReadyListener(object : ResourceListener {
+                    val qualityHeader: String = context.getString(R.string.quality)
+
                     override fun onResourceTracksReady(player: TrackSelectionArray) {
-                        val qualityHeader: String = context.getString(R.string.quality)
 
                         //to make sure we use only initial settings and do not  create duplicate groups
                         if (settings == null || settings?.groups?.get(qualityHeader) != null) return
 
                         val size = player[0]?.length() ?: 0
-                        val groupItemsArray = Array<SettingsLayout.Group.GroupItem?>(size) {null}
+                        val groupItemsArray = Array<SelectionGroup.Builder.SelectionGroupItem?>(size) {null}
 
                         val track = player[0]
 
                         for (i in 0 until size) {
                             groupItemsArray[i] = track?.getFormat(i).let { format ->
-                                SettingsLayout.Group.GroupItem("${format?.height}P", "${format?.bitrate}", R.drawable.full_hd_icon)
+                                SelectionGroup.Builder.SelectionGroupItem("${format?.height}P", "${format?.bitrate}", R.drawable.full_hd_icon,
+                                    track?.selectedFormat == format
+                                )
                             }
                         }
-                       val group = SettingsLayout.Group.Builder(context)
+                       val group = SelectionGroup.Builder(context)
                             .addHeader(qualityHeader)
                             .addItems(groupItemsArray)
                             .addOnClickListener { view, position ->
-                                val tracksFormats = track?.getFormat(position)?.apply {
+                                track?.getFormat(position)?.apply {
                                     DefaultTrackSelector.ParametersBuilder()
                                         .setMaxVideoSize(this.width, this.height)
                                         .build().also { multiStreamPlayer.setTrackSelectorParams(it) }
@@ -77,6 +82,17 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
                             .build()
 
                         addSettingsGroup(group)
+                    }
+
+                    override fun onTrackChanged(
+                        trackGroups: TrackGroupArray?,
+                        trackSelections: TrackSelectionArray?
+                    ) {
+                        settings?.groups?.get(qualityHeader).also {
+                            if(it != null) (it as SelectionGroup).selectedItemPosition = 4
+                        }
+
+
                     }
                 })
             recycle()

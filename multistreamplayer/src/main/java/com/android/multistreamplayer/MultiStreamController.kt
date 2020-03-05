@@ -2,6 +2,7 @@ package com.android.multistreamplayer
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.android.multistreamplayer.settings.ResourceListener
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.MediaSource
@@ -50,7 +51,12 @@ abstract class MultiStreamController(val ctx: Context, val player: SimpleExoPlay
         trackSelections: TrackSelectionArray?
     ) {
         super.onTracksChanged(trackGroups, trackSelections)
+        listeners.forEach {
+            it.onTrackChanged(trackGroups, trackSelections)
+        }
     }
+
+
 
     fun removeListener() {
         player.removeListener(listener)

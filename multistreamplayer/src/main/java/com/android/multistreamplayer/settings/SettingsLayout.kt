@@ -1,28 +1,22 @@
 package com.android.multistreamplayer.settings
 
 import android.content.Context
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.Typeface
-import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.ResourcesCompat
 import com.android.multistreamplayer.R
 import com.android.multistreamplayer.settings.animations.ExpandAnimation
+import com.android.multistreamplayer.settings.groups.SelectionGroup
 import com.android.multistreamplayer.util.ScreenUnit
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.CornerFamily.ROUNDED
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.textview.MaterialTextView
-import de.hdodenhof.circleimageview.CircleImageView
 import java.lang.IllegalStateException
 import java.lang.NullPointerException
 import java.util.*
@@ -117,34 +111,43 @@ class SettingsLayout : LinearLayout {
 
 
     //Groups, items, views builder
-    data class Group(val headerText: TextView, var items: List<MaterialCardView>? = null) {
+    open class Group(val headerText: TextView, var items: List<MaterialCardView>? = null) {
 
         var onClick: ((view: MaterialCardView, position: Int) -> Unit)? = null
         var onItemClickListener: OnItemClickListener? = null
 
-        constructor(headerText: TextView, items: List<MaterialCardView>? = null, itemOnClickListener: OnItemClickListener) : this(headerText, items) {
+        constructor(
+            headerText: TextView,
+            items: List<MaterialCardView>? = null,
+            itemOnClickListener: OnItemClickListener
+        ) : this(headerText, items) {
             this.onItemClickListener = itemOnClickListener
         }
 
-        constructor(headerText: TextView, items: List<MaterialCardView>? = null, onClick: ((view: MaterialCardView,  position: Int) -> Unit)? = null) : this(headerText, items) {
+        constructor(
+            headerText: TextView,
+            items: List<MaterialCardView>? = null,
+            onClick: ((view: MaterialCardView, position: Int) -> Unit)? = null
+        ) : this(headerText, items) {
             this.onClick = onClick
         }
 
-        class Builder(val context: Context) {
+        abstract class Builder(val context: Context) {
             var headerText: String? = null
 
 
-            private val marginStartGuideline = ScreenUnit.convertDpToPixel(32f, context).toInt()
+            protected val marginStartGuideline = ScreenUnit.convertDpToPixel(32f, context).toInt()
             private val componentMargin = ScreenUnit.convertDpToPixel(32f, context).toInt()
-            private val headerMargin = ScreenUnit.convertDpToPixel(16f, context).toInt()
-            private val defaultCornerRadius = context.resources.getDimension(R.dimen.defaultCornerRadius)
-            private var cardInsetMargin = ScreenUnit.convertDpToPixel(8f, context).toInt()
+            protected val headerMargin = ScreenUnit.convertDpToPixel(16f, context).toInt()
+            protected val defaultCornerRadius =
+                context.resources.getDimension(R.dimen.defaultCornerRadius)
+            protected var cardInsetMargin = ScreenUnit.convertDpToPixel(8f, context).toInt()
 
             var onClick: ((view: MaterialCardView, position: Int) -> Unit)? = null
             private var onClickListener: OnItemClickListener? = null
 
             val items: MutableList<MaterialCardView>? by lazy { mutableListOf<MaterialCardView>() }
-            private var groupItems: Array<GroupItem?>? = null
+            private var groupItems: Array<out GroupItem?>? = null
 
             fun build(): Group {
                 headerText ?: throw NullPointerException("headerText can't be null")
@@ -156,12 +159,17 @@ class SettingsLayout : LinearLayout {
                         index > 0 && index < this.groupItems!!.count() -> MIDDLE_CARD
                         else -> BOTTOM_CARD
                     }
-                    createItemCardView(cardType, groupItem?.imageDrawableId!!, groupItem.topText, groupItem.bottomText).also {items?.add(it)}
+                    createItemCardView(
+                        cardType,
+                        groupItem?.imageDrawableId!!,
+                        groupItem.topText,
+                        groupItem.bottomText
+                    ).also { items?.add(it) }
                 }
                 return when {
-                    onClick != null -> Group(headerTextView, items, onClick)
-                    onClickListener != null -> Group(headerTextView, items, onClickListener!!)
-                    else -> Group(headerTextView, items)
+                    onClick != null -> SelectionGroup(headerTextView, items, onClick)
+                    onClickListener != null -> SelectionGroup(headerTextView, items, onClickListener!!)
+                    else -> SelectionGroup(headerTextView, items)
                 }
             }
 
@@ -171,34 +179,41 @@ class SettingsLayout : LinearLayout {
                 return this
             }
 
-            fun addOnClickListener(onClick: (view: MaterialCardView, position: Int) -> Unit) : Builder {
+            fun addOnClickListener(onClick: (view: MaterialCardView, position: Int) -> Unit): Builder {
                 this.onClick = onClick
                 return this
             }
 
-            fun addOnClickListener(onClickListener: OnItemClickListener) : Builder{
+            fun addOnClickListener(onClickListener: OnItemClickListener): Builder {
                 this.onClickListener = onClickListener
                 return this
             }
 
-            fun addItems(groupItems: Array<GroupItem?>): Builder {
+            fun addItems(groupItems: Array<out GroupItem?>): Builder {
                 if (groupItems.isEmpty()) return this else this.groupItems = groupItems
                 return this
             }
 
-           private fun createComponentNameView(componentName: String) : MaterialTextView {
-               return MaterialTextView(context, null, R.attr.textAppearanceHeadline5  ).apply {
-                   layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
-                       marginStart = marginStartGuideline
-                       topMargin = componentMargin
-                   }
-                   setTypeface(null, Typeface.BOLD)
-                   text = componentName
-               }
+            private fun createComponentNameView(componentName: String): MaterialTextView {
+                return MaterialTextView(context, null, R.attr.textAppearanceHeadline5).apply {
+                    layoutParams =
+                        LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+                            marginStart = marginStartGuideline
+                            topMargin = componentMargin
+                        }
+                    setTypeface(null, Typeface.BOLD)
+                    text = componentName
+                }
             }
 
-            private fun createItemCardView(cardType: Int = MIDDLE_CARD, drawableId: Int, topText: String, bottomText: String) : MaterialCardView {
+            abstract fun createCustomCardView(drawableId: Int, topText: String, bottomText: String, card: MaterialCardView) : MaterialCardView
 
+            open fun createItemCardView(
+                cardType: Int = MIDDLE_CARD,
+                drawableId: Int,
+                topText: String,
+                bottomText: String
+            ): MaterialCardView {
                 var topLeftCornerRadius = 0f
                 var topRightCornerRadius = 0f
                 var bottomLeftCornerRadius = 0f
@@ -227,60 +242,28 @@ class SettingsLayout : LinearLayout {
                         .setBottomRightCorner(ROUNDED, bottomRightCornerRadius)
                         .build()
                     cardElevation = 4f
-                    layoutParams = MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                    layoutParams = MarginLayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    ).apply {
                         this.topMargin = topMargin
                         marginStart = marginStartGuideline
                         marginEnd = marginStartGuideline
                         this.bottomMargin = bottomMargin
                     }
                 }
-
-                val constraintLayout = ConstraintLayout(context).apply {
-                    id = R.id.textThree
-                    val itemImage = CircleImageView(context).also {circleImage ->
-                        circleImage.id = R.id.itemImage
-                        circleImage.borderWidth = 2
-                        circleImage.borderColor = Color.parseColor("#000000")
-                        circleImage.setImageDrawable(ResourcesCompat.getDrawable(resources, drawableId, context?.theme))
-                    }
-
-                    val textOne = MaterialTextView(context, null, R.attr.textAppearanceBody1).apply {
-                        id = R.id.textOne
-                        setTypeface(null, Typeface.BOLD)
-                        text = topText
-                    }
-
-                    val textTwo = MaterialTextView(context, null, R.attr.textAppearanceBody2).apply {
-                        id = R.id.textTwo
-                        text = bottomText
-                    }
-
-                    val selectionIcon = ImageView(context).apply {
-                        id = R.id.selectionIcon
-                        scaleType = ImageView.ScaleType.FIT_CENTER
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            imageTintList = ColorStateList.valueOf(Color.GREEN)
-                        }
-                        setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.selection_icon, context?.theme))
-                    }
-
-                    setConstraintSet(ConstraintSet().also { it.clone(context, R.layout.settings_item_layout) })
-
-                    addView(itemImage)
-                    addView(textOne)
-                    addView(textTwo)
-                    addView(selectionIcon)
-                }
-                card.addView(constraintLayout)
-                return card
+              return createCustomCardView(drawableId, topText, bottomText, card)
             }
 
+            open class GroupItem(
+                val topText: String,
+                val bottomText: String,
+                val imageDrawableId: Int
+            )
         }
 
-        data class GroupItem(val topText: String, val bottomText: String, val imageDrawableId: Int)
-    }
-
-    interface OnItemClickListener {
-        fun onItemClick(view: MaterialCardView, position: Int)
+        interface OnItemClickListener {
+            fun onItemClick(view: MaterialCardView, position: Int)
+        }
     }
 }
