@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
@@ -58,12 +59,11 @@ class SettingsLayout : LinearLayout {
 
     private fun init(context: Context?, attrs: AttributeSet? = null) {
         orientation = VERTICAL
-
         addBackButton()
         addHeaderView("SETTINGS")
     }
 
-    fun addHeaderView(headerName: String) {
+    private fun addHeaderView(headerName: String) {
         val view = MaterialTextView(context, null, R.attr.textAppearanceHeadline3  ).apply {
             layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
                 marginStart = marginStartGuideline
@@ -95,8 +95,14 @@ class SettingsLayout : LinearLayout {
 
     fun addGroup(group: Group) {
         addView(group.headerText)
-        group.items?.forEach {
-            addView(it)
+        group.items?.forEachIndexed {index, card ->
+            addView(card)
+            if (group.onClick != null) card.setOnClickListener {
+                group.onClick!!.invoke(card, index)
+            }
+            else if(group.onItemClickListener != null) card.setOnClickListener {
+                group.onItemClickListener!!.onItemClick(card, index)
+            }
         }
         groups[group.headerText.text.toString()] = group
     }
@@ -107,7 +113,22 @@ class SettingsLayout : LinearLayout {
     }
 
 
+
+
+
+    //Groups, items, views builder
     data class Group(val headerText: TextView, var items: List<MaterialCardView>? = null) {
+
+        var onClick: ((view: MaterialCardView, position: Int) -> Unit)? = null
+        var onItemClickListener: OnItemClickListener? = null
+
+        constructor(headerText: TextView, items: List<MaterialCardView>? = null, itemOnClickListener: OnItemClickListener) : this(headerText, items) {
+            this.onItemClickListener = itemOnClickListener
+        }
+
+        constructor(headerText: TextView, items: List<MaterialCardView>? = null, onClick: ((view: MaterialCardView,  position: Int) -> Unit)? = null) : this(headerText, items) {
+            this.onClick = onClick
+        }
 
         class Builder(val context: Context) {
             var headerText: String? = null
@@ -119,11 +140,15 @@ class SettingsLayout : LinearLayout {
             private val defaultCornerRadius = context.resources.getDimension(R.dimen.defaultCornerRadius)
             private var cardInsetMargin = ScreenUnit.convertDpToPixel(8f, context).toInt()
 
+            var onClick: ((view: MaterialCardView, position: Int) -> Unit)? = null
+            private var onClickListener: OnItemClickListener? = null
+
             val items: MutableList<MaterialCardView>? by lazy { mutableListOf<MaterialCardView>() }
             private var groupItems: Array<GroupItem?>? = null
+
             fun build(): Group {
                 headerText ?: throw NullPointerException("headerText can't be null")
-                val headerTextView = addComponentNameView(headerText!!)
+                val headerTextView = createComponentNameView(headerText!!)
 
                 this.groupItems?.forEachIndexed { index, groupItem ->
                     val cardType = when {
@@ -131,10 +156,13 @@ class SettingsLayout : LinearLayout {
                         index > 0 && index < this.groupItems!!.count() -> MIDDLE_CARD
                         else -> BOTTOM_CARD
                     }
-                    val view = addItemCardView(cardType, groupItem?.imageDrawableId!!, groupItem.topText, groupItem.bottomText)
-                    items?.add(view)
+                    createItemCardView(cardType, groupItem?.imageDrawableId!!, groupItem.topText, groupItem.bottomText).also {items?.add(it)}
                 }
-                return Group(headerTextView, items)
+                return when {
+                    onClick != null -> Group(headerTextView, items, onClick)
+                    onClickListener != null -> Group(headerTextView, items, onClickListener!!)
+                    else -> Group(headerTextView, items)
+                }
             }
 
             fun addHeader(headerText: String): Builder {
@@ -143,13 +171,22 @@ class SettingsLayout : LinearLayout {
                 return this
             }
 
+            fun addOnClickListener(onClick: (view: MaterialCardView, position: Int) -> Unit) : Builder {
+                this.onClick = onClick
+                return this
+            }
+
+            fun addOnClickListener(onClickListener: OnItemClickListener) : Builder{
+                this.onClickListener = onClickListener
+                return this
+            }
 
             fun addItems(groupItems: Array<GroupItem?>): Builder {
                 if (groupItems.isEmpty()) return this else this.groupItems = groupItems
                 return this
             }
 
-           private fun addComponentNameView(componentName: String) : MaterialTextView {
+           private fun createComponentNameView(componentName: String) : MaterialTextView {
                return MaterialTextView(context, null, R.attr.textAppearanceHeadline5  ).apply {
                    layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
                        marginStart = marginStartGuideline
@@ -160,7 +197,7 @@ class SettingsLayout : LinearLayout {
                }
             }
 
-            private fun addItemCardView(cardType: Int = MIDDLE_CARD, drawableId: Int, topText: String, bottomText: String) : MaterialCardView {
+            private fun createItemCardView(cardType: Int = MIDDLE_CARD, drawableId: Int, topText: String, bottomText: String) : MaterialCardView {
 
                 var topLeftCornerRadius = 0f
                 var topRightCornerRadius = 0f
@@ -221,7 +258,9 @@ class SettingsLayout : LinearLayout {
                     val selectionIcon = ImageView(context).apply {
                         id = R.id.selectionIcon
                         scaleType = ImageView.ScaleType.FIT_CENTER
-                        imageTintList = ColorStateList.valueOf(Color.GREEN)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            imageTintList = ColorStateList.valueOf(Color.GREEN)
+                        }
                         setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.selection_icon, context?.theme))
                     }
 
@@ -239,5 +278,9 @@ class SettingsLayout : LinearLayout {
         }
 
         data class GroupItem(val topText: String, val bottomText: String, val imageDrawableId: Int)
+    }
+
+    interface OnItemClickListener {
+        fun onItemClick(view: MaterialCardView, position: Int)
     }
 }

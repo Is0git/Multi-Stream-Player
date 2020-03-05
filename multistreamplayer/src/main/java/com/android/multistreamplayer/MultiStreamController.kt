@@ -5,6 +5,8 @@ import android.net.Uri
 import com.android.multistreamplayer.settings.ResourceListener
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 
 abstract class MultiStreamController(val ctx: Context, val player: SimpleExoPlayer) :
@@ -41,6 +43,13 @@ abstract class MultiStreamController(val ctx: Context, val player: SimpleExoPlay
                 it.onResourceTracksReady(player.currentTrackSelections)
             }
         }
+    }
+
+    override fun onTracksChanged(
+        trackGroups: TrackGroupArray?,
+        trackSelections: TrackSelectionArray?
+    ) {
+        super.onTracksChanged(trackGroups, trackSelections)
     }
 
     fun removeListener() {

@@ -13,8 +13,9 @@ class MultiStreamPlayer(val context: Context, val playerType: Int)  {
         const val VIDEO: Int = 2
     }
 
+    var trackSelector = DefaultTrackSelector()
     var controller: MultiStreamController? = null
-    var player: SimpleExoPlayer = ExoPlayerFactory.newSimpleInstance(context, DefaultTrackSelector())
+    var player: SimpleExoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector)
 
     init {
         controller = if (playerType == LIVE_STREAM) LiveStreamController(context, player) else VideoController(context, player)
@@ -22,5 +23,9 @@ class MultiStreamPlayer(val context: Context, val playerType: Int)  {
 
     fun play(uri: String) {
         controller?.play(uri)
+    }
+
+    fun setTrackSelectorParams(params: DefaultTrackSelector.Parameters) {
+        trackSelector.parameters = params
     }
 }
