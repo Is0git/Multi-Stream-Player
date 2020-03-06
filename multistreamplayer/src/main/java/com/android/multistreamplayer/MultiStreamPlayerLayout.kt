@@ -8,10 +8,12 @@ import android.widget.ImageView
 import android.widget.ScrollView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.android.multistreamplayer.MultiStreamPlayer.Companion.LIVE_STREAM
+import com.android.multistreamplayer.alarm.Alarm
 import com.android.multistreamplayer.settings.ResourceListener
 import com.android.multistreamplayer.settings.SettingsLayout
 import com.android.multistreamplayer.settings.animations.ExpandAnimation
@@ -41,6 +43,9 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
     private var settingsScrollView: ScrollView? = null
     private var settingsIconView: ImageButton? = null
     private var settingsExpandAnimation: ExpandAnimation? = null
+
+    lateinit var alarm: Alarm
+    var alarmImageButton: ImageButton? = null
 
     private var playerType: Int = LIVE_STREAM
 
@@ -76,9 +81,12 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
                         .addItems(groupItemsArray)
                         .addSelectionListener { selectionGroup, position ->
                             selectionGroup.items?.forEach {
-                                it.findViewById<ImageView>(R.id.selectionIcon)?.visibility = View.INVISIBLE
+                                it.findViewById<ImageView>(R.id.selectionIcon)?.visibility =
+                                    View.INVISIBLE
                             }
-                            selectionGroup.items?.get(position)?.findViewById<ImageView>(R.id.selectionIcon)?.visibility = View.VISIBLE
+                            selectionGroup.items?.get(position)
+                                ?.findViewById<ImageView>(R.id.selectionIcon)?.visibility =
+                                View.VISIBLE
                             playAnimation()
                             multiStreamPlayer.buildTracksParams(track, position)
                             Toast.makeText(context, "CLICKED: $position", Toast.LENGTH_SHORT).show()
@@ -108,8 +116,10 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         playerView = findViewById(R.id.player)
 
         playerView?.player = multiStreamPlayer.player.apply {
-
+            //            playWhenReady = true
         }
+
+        alarmImageButton = playerView?.findViewById(R.id.alarm_icon)
 
         settingsScrollView = findViewById(R.id.settings_scroll_view)
         settings = settingsScrollView?.findViewById(R.id.settings)
@@ -126,6 +136,14 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         settings?.backButton?.setOnClickListener {
             playAnimation()
         }
+    }
+
+
+    fun initAlarm(supportFragmentManager: FragmentManager) {
+        Alarm(
+            context,
+            supportFragmentManager
+        ).also { alarm -> alarmImageButton?.setOnClickListener { alarm.showDialog() } }
     }
 
     private fun addOnResourceReadyListener(listener: ResourceListener) {

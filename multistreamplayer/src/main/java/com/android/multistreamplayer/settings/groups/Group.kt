@@ -40,12 +40,12 @@ abstract class Group(val headerText: TextView, var items: List<MaterialCardView>
         var headerText: String? = null
 
 
-        protected val marginStartGuideline = ScreenUnit.convertDpToPixel(32f, context).toInt()
+        private val marginStartGuideline = ScreenUnit.convertDpToPixel(32f, context).toInt()
         private val componentMargin = ScreenUnit.convertDpToPixel(32f, context).toInt()
-        protected val headerMargin = ScreenUnit.convertDpToPixel(16f, context).toInt()
-        protected val defaultCornerRadius =
+        private val headerMargin = ScreenUnit.convertDpToPixel(16f, context).toInt()
+        private val defaultCornerRadius =
             context.resources.getDimension(R.dimen.defaultCornerRadius)
-        protected var cardInsetMargin = ScreenUnit.convertDpToPixel(8f, context).toInt()
+        private var cardInsetMargin = ScreenUnit.convertDpToPixel(8f, context).toInt()
 
         var onClick: ((view: MaterialCardView, position: Int) -> Unit)? = null
         private var onClickListener: OnItemClickListener? = null

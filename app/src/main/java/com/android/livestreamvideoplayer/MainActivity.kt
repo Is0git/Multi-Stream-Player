@@ -1,5 +1,6 @@
 package com.android.livestreamvideoplayer
 
+import android.app.AlarmManager
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -7,6 +8,8 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.AlarmManagerCompat
+import androidx.core.content.getSystemService
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.android.livestreamvideoplayer.databinding.ActivityMainBinding
@@ -22,17 +25,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initService()
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        (binding.root as MultiStreamPlayerLayout)
-
+        (binding.root as MultiStreamPlayerLayout).apply {
+            initAlarm(supportFragmentManager)
+            registerLifeCycle(lifecycle)
+        }
+        var alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         getUrl()
 
     }
 
-    fun initService() {
+    private fun initService() {
         videoService = com.android.livestreamvideoplayer.retrofit.Retrofit.getRetrofit("https://api.twitch.tv").create(VideoService::class.java)
     }
 
-    fun getUrl()  {
+    private fun getUrl()  {
         lifecycleScope.launch {
             val response = videoService.getAccessToken()
             Log.d("PALYER", "${response.body()?.token}")
