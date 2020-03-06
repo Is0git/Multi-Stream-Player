@@ -2,7 +2,9 @@ package com.android.multistreamplayer
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.ScrollView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -13,9 +15,9 @@ import com.android.multistreamplayer.MultiStreamPlayer.Companion.LIVE_STREAM
 import com.android.multistreamplayer.settings.ResourceListener
 import com.android.multistreamplayer.settings.SettingsLayout
 import com.android.multistreamplayer.settings.animations.ExpandAnimation
-import com.android.multistreamplayer.settings.groups.SelectionGroup
+import com.android.multistreamplayer.settings.groups.Group
+import com.android.multistreamplayer.settings.groups.selection_group.SelectionGroup
 import com.google.android.exoplayer2.source.TrackGroupArray
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.PlayerView
 
@@ -47,54 +49,52 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
             playerType = getInt(
                 R.styleable.MultiStreamPlayerLayout_playerType,
                 LIVE_STREAM
-            ).also { playerType -> multiStreamPlayer = MultiStreamPlayer(context, playerType)}
-                addOnResourceReadyListener(object : ResourceListener {
-                    val qualityHeader: String = context.getString(R.string.quality)
+            ).also { playerType -> multiStreamPlayer = MultiStreamPlayer(context, playerType) }
+            addOnResourceReadyListener(object : ResourceListener {
+                val qualityHeader: String = context.getString(R.string.quality)
+                override fun onResourceTracksReady(player: TrackSelectionArray) {
 
-                    override fun onResourceTracksReady(player: TrackSelectionArray) {
+                    //to make sure we use only initial settings and do not  create duplicate groups
+                    if (settings == null || settings?.groups?.get(qualityHeader) != null) return
 
-                        //to make sure we use only initial settings and do not  create duplicate groups
-                        if (settings == null || settings?.groups?.get(qualityHeader) != null) return
+                    val size = player[0]?.length() ?: 0
+                    val groupItemsArray =
+                        Array<SelectionGroup.Builder.SelectionGroupItem?>(size) { null }
 
-                        val size = player[0]?.length() ?: 0
-                        val groupItemsArray = Array<SelectionGroup.Builder.SelectionGroupItem?>(size) {null}
+                    val track = player[0]
 
-                        val track = player[0]
-
-                        for (i in 0 until size) {
-                            groupItemsArray[i] = track?.getFormat(i).let { format ->
-                                SelectionGroup.Builder.SelectionGroupItem("${format?.height}P", "${format?.bitrate}", R.drawable.full_hd_icon,
-                                    track?.selectedFormat == format
-                                )
-                            }
+                    for (i in 0 until size) {
+                        groupItemsArray[i] = track?.getFormat(i).let { format ->
+                            SelectionGroup.Builder.SelectionGroupItem(
+                                "${format?.height}P", "${format?.bitrate}", R.drawable.full_hd_icon,
+                                track?.selectedFormat == format
+                            )
                         }
-                       val group = SelectionGroup.Builder(context)
-                            .addHeader(qualityHeader)
-                            .addItems(groupItemsArray)
-                            .addOnClickListener { view, position ->
-                                track?.getFormat(position)?.apply {
-                                    DefaultTrackSelector.ParametersBuilder()
-                                        .setMaxVideoSize(this.width, this.height)
-                                        .build().also { multiStreamPlayer.setTrackSelectorParams(it) }
-                                }
-                                Toast.makeText(context, "CLICKED: $position", Toast.LENGTH_SHORT).show()
+                    }
+                    val group = SelectionGroup.Builder(context)
+                        .addHeader(qualityHeader)
+                        .addItems(groupItemsArray)
+                        .addSelectionListener { selectionGroup, position ->
+                            selectionGroup.items?.forEach {
+                                it.findViewById<ImageView>(R.id.selectionIcon)?.visibility = View.INVISIBLE
                             }
-                            .build()
-
-                        addSettingsGroup(group)
-                    }
-
-                    override fun onTrackChanged(
-                        trackGroups: TrackGroupArray?,
-                        trackSelections: TrackSelectionArray?
-                    ) {
-                        settings?.groups?.get(qualityHeader).also {
-                            if(it != null) (it as SelectionGroup).selectedItemPosition = 4
+                            selectionGroup.items?.get(position)?.findViewById<ImageView>(R.id.selectionIcon)?.visibility = View.VISIBLE
+                            playAnimation()
+                            multiStreamPlayer.buildTracksParams(track, position)
+                            Toast.makeText(context, "CLICKED: $position", Toast.LENGTH_SHORT).show()
                         }
+                        .build()
 
+                    addSettingsGroup(group)
+                }
 
-                    }
-                })
+                override fun onTrackChanged(
+                    trackGroups: TrackGroupArray?,
+                    trackSelections: TrackSelectionArray?
+                ) {
+
+                }
+            })
             recycle()
         }
     }
@@ -115,13 +115,20 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         settings = settingsScrollView?.findViewById(R.id.settings)
         settingsIconView = playerView?.findViewById(R.id.settings_icon)
 
-        settingsExpandAnimation = ExpandAnimation(context, R.transition.expand_transition).also { settings?.expandAnimation = it }
+        settingsExpandAnimation = ExpandAnimation(
+            context,
+            R.transition.expand_transition
+        ).also { settings?.expandAnimation = it }
 
-        settingsIconView?.setOnClickListener { settingsExpandAnimation?.playAnimation(settingsScrollView, rootView = this) }
-        settings?.backButton?.setOnClickListener { settingsExpandAnimation?.playAnimation(settingsScrollView, rootView = this) }
+        settingsIconView?.setOnClickListener {
+            playAnimation()
+        }
+        settings?.backButton?.setOnClickListener {
+            playAnimation()
+        }
     }
 
-    fun addOnResourceReadyListener(listener: ResourceListener) {
+    private fun addOnResourceReadyListener(listener: ResourceListener) {
         multiStreamPlayer.controller?.listeners?.add(listener)
     }
 
@@ -129,7 +136,11 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         multiStreamPlayer.play(uri)
     }
 
-    fun addSettingsGroup(group: SettingsLayout.Group) {
+    fun playAnimation() {
+        settingsExpandAnimation?.playAnimation(settingsScrollView, rootView = this)
+    }
+
+    fun addSettingsGroup(group: Group) {
         settings?.addGroup(group)
     }
 

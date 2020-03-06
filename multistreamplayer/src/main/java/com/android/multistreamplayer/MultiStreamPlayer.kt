@@ -5,6 +5,8 @@ import android.util.AttributeSet
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.trackselection.TrackSelection
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.PlayerView
 
 class MultiStreamPlayer(val context: Context, val playerType: Int)  {
@@ -25,7 +27,15 @@ class MultiStreamPlayer(val context: Context, val playerType: Int)  {
         controller?.play(uri)
     }
 
-    fun setTrackSelectorParams(params: DefaultTrackSelector.Parameters) {
+    fun buildTracksParams(track: TrackSelection?, position: Int) {
+        track?.getFormat(position)?.apply {
+            DefaultTrackSelector.ParametersBuilder()
+                .setMaxVideoSize(this.width, this.height)
+                .build().also { setTrackSelectorParams(it) }
+        }
+    }
+
+    private fun setTrackSelectorParams(params: DefaultTrackSelector.Parameters) {
         trackSelector.parameters = params
     }
 }

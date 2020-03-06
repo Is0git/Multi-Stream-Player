@@ -1,4 +1,4 @@
-package com.android.multistreamplayer.settings.groups
+package com.android.multistreamplayer.settings.groups.selection_group
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -13,12 +13,13 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.res.ResourcesCompat
 import com.android.multistreamplayer.R
 import com.android.multistreamplayer.settings.SettingsLayout
+import com.android.multistreamplayer.settings.groups.Group
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textview.MaterialTextView
 import de.hdodenhof.circleimageview.CircleImageView
 import java.lang.IllegalStateException
 
-class SelectionGroup : SettingsLayout.Group {
+class SelectionGroup : Group {
     constructor(headerText: TextView, items: List<MaterialCardView>?) : super(headerText, items)
     constructor(
         headerText: TextView,
@@ -35,21 +36,32 @@ class SelectionGroup : SettingsLayout.Group {
     var selectedItemPosition = 0
         set(value) {
             items?.also {
-                if (value < 0 && value > it.count()) throw ArrayIndexOutOfBoundsException("select position must be in bounds of items")
-                getSelectedIcon(field).visibility = View.VISIBLE
-                getSelectedIcon(lastSelectedItemPosition).visibility = View.INVISIBLE
+                if (value < 0 && value >= it.count()) throw ArrayIndexOutOfBoundsException("select position must be in bounds of items")
+                getSelectedIcon(value).visibility = View.VISIBLE
             }
-            lastSelectedItemPosition = field
-            field = value
         }
 
-    var lastSelectedItemPosition = 0
+    var selectionListener: SelectionListener? = null
+    var onSelect: ((selectionGroup: SelectionGroup, position: Int) -> Unit)? = null
 
     private fun getSelectedIcon(position: Int) : ImageView {
       return items?.get(position)?.findViewById(R.id.selectionIcon) ?: throw IllegalStateException("couldn't find view")
     }
 
-    class Builder(context: Context) : SettingsLayout.Group.Builder(context) {
+    class Builder(context: Context) : Group.Builder<Builder, SelectionGroup>(context) {
+
+        var selectionListener: SelectionListener? = null
+        var onSelect: ((selectionGroup: SelectionGroup, position: Int) -> Unit)? = null
+
+        fun addSelectionListener(selectionListener: SelectionListener) : Builder {
+            this.selectionListener = selectionListener
+            return this
+        }
+
+        fun addSelectionListener(onSelect: (selectionGroup: SelectionGroup, position: Int) -> Unit) : Builder {
+            this.onSelect = onSelect
+            return this
+        }
 
         override fun createCustomCardView(
             drawableId: Int,
@@ -97,13 +109,45 @@ class SelectionGroup : SettingsLayout.Group {
             return card
         }
 
+
+
         class SelectionGroupItem(
             topText: String,
             bottomText: String,
             imageDrawableId: Int,
             var isSelected: Boolean
-        ) : SettingsLayout.Group.Builder.GroupItem(topText, bottomText, imageDrawableId) {
+        ) : Group.Builder.GroupItem(topText, bottomText, imageDrawableId) {
+        }
 
+        override fun customBuild(
+            headerText: MaterialTextView,
+            items: List<MaterialCardView>?
+        ): SelectionGroup {
+            val selectionGroup = when {
+                onClick != null -> SelectionGroup(
+                    headerText,
+                    items,
+                    onClick
+                )
+
+                else -> SelectionGroup(
+                    headerText,
+                    items
+                )
+            }
+
+            return selectionGroup.apply {
+                this.onSelect = this@Builder.onSelect
+                this.selectionListener = this@Builder.selectionListener
+                    items?.forEachIndexed { index, materialCardView ->
+                        if (selectionListener != null) materialCardView.setOnClickListener { selectionListener!!.onItemSelect(this, index)}
+                        else if (onSelect != null) materialCardView.setOnClickListener { onSelect?.invoke(this, index) }
+                }
+            }
+        }
+
+        override fun getThis(): Builder {
+            return this
         }
     }
 }
