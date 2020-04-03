@@ -10,4 +10,5 @@
     <item name="textTwo" type="id"/>
     <item name="textThree" type="id"/>
     <item name="selectionIcon" type="id"/>
+    <item name="chat" type="id"/>
 </resources>

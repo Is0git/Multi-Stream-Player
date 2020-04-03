@@ -3,17 +3,28 @@ package com.android.multistreamplayer
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ScrollView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import androidx.recyclerview.widget.RecyclerView
+import com.android.multistreamchat.chat.Chat
+import com.android.multistreamchat.chat.chat_parser.ChatParser
+import com.android.multistreamchat.chat.listeners.DataListener
+import com.android.multistreamchat.chat.listeners.EmoteStateListener
+import com.android.multistreamchat.twitch_chat.chat_emotes.TwitchEmotesManager
 import com.android.multistreamplayer.MultiStreamPlayer.Companion.LIVE_STREAM
 import com.android.multistreamplayer.alarm.Alarm
+import com.android.multistreamplayer.chat.adapters.ChatAdapter
+import com.android.multistreamplayer.chat.chat_factories.ChatFactory
+import com.android.multistreamplayer.chat.chat_factories.ChatType
 import com.android.multistreamplayer.settings.ResourceListener
 import com.android.multistreamplayer.settings.SettingsLayout
 import com.android.multistreamplayer.settings.animations.ExpandAnimation
@@ -38,7 +49,9 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
     lateinit var multiStreamPlayer: MultiStreamPlayer
 
     private var playerView: PlayerView? = null
-
+    private var chatList: RecyclerView? = null
+    private var chatAdapter: ChatAdapter? = null
+    private var chat: Chat? = null
     private var settings: SettingsLayout? = null
     private var settingsScrollView: ScrollView? = null
     private var settingsIconView: ImageButton? = null
@@ -50,11 +63,14 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
     private var playerType: Int = LIVE_STREAM
 
     private fun init(context: Context?, attrs: AttributeSet? = null) {
+
         context?.obtainStyledAttributes(attrs, R.styleable.MultiStreamPlayerLayout)?.apply {
             playerType = getInt(
                 R.styleable.MultiStreamPlayerLayout_playerType,
                 LIVE_STREAM
-            ).also { playerType -> multiStreamPlayer = MultiStreamPlayer(context, playerType) }
+            ).also { playerType ->
+                multiStreamPlayer = MultiStreamPlayer(context, playerType).also { it.chat = chat }
+            }
             addOnResourceReadyListener(object : ResourceListener {
                 val qualityHeader: String = context.getString(R.string.quality)
                 override fun onResourceTracksReady(player: TrackSelectionArray) {
@@ -107,6 +123,55 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         }
     }
 
+
+    private fun initChat(chatType: ChatType) {
+        chat = buildChat(chatType)
+
+    }
+
+    private fun buildChat(chatType: ChatType): Chat {
+
+        return ChatFactory.create(chatType, context)
+
+//       return Chat.Builder()
+//            .autoConnect(channelName)
+//            .setClient(Chat.HOST, Chat.PORT)
+//            .addDataListener(object :
+//                DataListener {
+//                override fun onReceive(message: ChatParser.Message) {
+//                    chatAdapter?.addLine(message)
+//                }
+//            })
+//            .addEmoteStateListener(object :
+//                EmoteStateListener<Int, TwitchEmotesManager.TwitchEmote> {
+//                override fun onStartFetch() {
+//
+//                }
+//
+//                override fun onEmotesFetched() {
+//
+//                }
+//
+//                override fun onDownload() {
+//
+//                }
+//
+//                override fun onFailed(throwable: Throwable?) {
+//
+//                }
+//
+//                override fun onComplete(emoteSet: List<TwitchEmotesManager.TwitchEmote>) {
+//
+//                }
+//            })
+//           .apply { if (username != null && token != null) {
+//               setUsername(username)
+//               setUserToken(token)
+//           } }
+//            .build(context)
+
+    }
+
     override fun onFinishInflate() {
         super.onFinishInflate()
         allocateViews()
@@ -116,7 +181,17 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         playerView = findViewById(R.id.player)
 
         playerView?.player = multiStreamPlayer.player.apply {
-            //            playWhenReady = true
+            playWhenReady = true
+        }
+
+        chatList = findViewById(R.id.chat)
+
+        chatList?.layoutParams = LayoutParams(MATCH_PARENT, MATCH_CONSTRAINT).apply {
+            this.topToBottom = this@MultiStreamPlayerLayout.playerView?.id!!
+            this.bottomToBottom = id
+        }
+        chatAdapter = ChatAdapter().also {
+            chatList?.adapter = it
         }
 
         alarmImageButton = playerView?.findViewById(R.id.alarm_icon)
@@ -137,7 +212,6 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
             playAnimation()
         }
     }
-
 
     fun initAlarm(supportFragmentManager: FragmentManager) {
         Alarm(

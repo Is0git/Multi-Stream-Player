@@ -14,9 +14,16 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.android.livestreamvideoplayer.databinding.ActivityMainBinding
 import com.android.livestreamvideoplayer.retrofit.VideoService
+import com.android.multistreamchat.chat.Chat
+import com.android.multistreamchat.chat.chat_parser.ChatParser
+import com.android.multistreamchat.chat.listeners.DataListener
+import com.android.multistreamchat.chat.listeners.EmoteStateListener
+import com.android.multistreamchat.twitch_chat.chat_emotes.TwitchEmotesManager
+import com.android.multistreamchat.twitch_chat.chat_parser.TwitchChatParser
 import com.android.multistreamplayer.MultiStreamPlayerLayout
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
+import retrofit2.http.Url
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -29,8 +36,7 @@ class MainActivity : AppCompatActivity() {
             initAlarm(supportFragmentManager)
             registerLifeCycle(lifecycle)
         }
-        var alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        getUrl()
+        getUrl("greekgodx")
 
     }
 
@@ -38,15 +44,14 @@ class MainActivity : AppCompatActivity() {
         videoService = com.android.livestreamvideoplayer.retrofit.Retrofit.getRetrofit("https://api.twitch.tv").create(VideoService::class.java)
     }
 
-    private fun getUrl()  {
+    private fun getUrl(channelName: String)  {
         lifecycleScope.launch {
-            val response = videoService.getAccessToken()
-            Log.d("PALYER", "${response.body()?.token}")
+            val response = videoService.getAccessToken("https://api.twitch.tv/api/channels/$channelName/access_token")
             response.body()?.token.let { it?.replace("%", "") }
             val uri = Uri.Builder()
                 .scheme("http")
                 .authority("usher.twitch.tv")
-                .encodedPath("api/channel/hls/nickeh30.m3u8")
+                .encodedPath("api/channel/hls/$channelName.m3u8")
                 .encodedQuery("token=${response.body()?.token}" )
                 .appendQueryParameter("sig", response.body()?.sig)
                 .appendQueryParameter("player", "twitchweb")
@@ -55,8 +60,8 @@ class MainActivity : AppCompatActivity() {
                 .appendQueryParameter("type", "any")
                 .appendQueryParameter("p", "9333029")
                 .build()
-            Log.d("PALYER", "$uri")
             (binding.root as MultiStreamPlayerLayout).play(uri.toString())
         }
     }
+
 }
