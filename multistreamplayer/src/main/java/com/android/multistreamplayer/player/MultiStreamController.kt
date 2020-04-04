@@ -1,8 +1,7 @@
-package com.android.multistreamplayer
+package com.android.multistreamplayer.player
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import com.android.multistreamplayer.settings.ResourceListener
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.MediaSource

@@ -1,6 +1,7 @@
-package com.android.livestreamvideoplayer.retrofit
+package com.android.multistreamplayer.api.twitch
 
-import com.android.livestreamvideoplayer.retrofit.models.Token
+
+import com.android.multistreamplayer.api.twitch.models.Token
 import retrofit2.Response
 import retrofit2.http.*
 

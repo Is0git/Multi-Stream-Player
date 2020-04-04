@@ -1,4 +1,4 @@
-package com.android.livestreamvideoplayer.retrofit
+package com.android.multistreamplayer.api.twitch
 
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory

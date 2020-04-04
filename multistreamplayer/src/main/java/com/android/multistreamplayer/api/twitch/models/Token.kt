@@ -1,4 +1,4 @@
-package com.android.livestreamvideoplayer.retrofit.models
+package com.android.multistreamplayer.api.twitch.models
 
 
 import com.squareup.moshi.Json

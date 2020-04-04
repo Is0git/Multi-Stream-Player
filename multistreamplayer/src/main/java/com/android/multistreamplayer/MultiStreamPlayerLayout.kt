@@ -16,15 +16,16 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.recyclerview.widget.RecyclerView
 import com.android.multistreamchat.chat.Chat
-import com.android.multistreamchat.chat.chat_parser.ChatParser
-import com.android.multistreamchat.chat.listeners.DataListener
-import com.android.multistreamchat.chat.listeners.EmoteStateListener
-import com.android.multistreamchat.twitch_chat.chat_emotes.TwitchEmotesManager
-import com.android.multistreamplayer.MultiStreamPlayer.Companion.LIVE_STREAM
+import com.android.multistreamchat.twitch_chat.api.RetrofitInstance
+import com.android.multistreamplayer.player.MultiStreamPlayer.Companion.LIVE_STREAM
 import com.android.multistreamplayer.alarm.Alarm
 import com.android.multistreamplayer.chat.adapters.ChatAdapter
 import com.android.multistreamplayer.chat.chat_factories.ChatFactory
 import com.android.multistreamplayer.chat.chat_factories.ChatType
+import com.android.multistreamplayer.media_source.MediaSource
+import com.android.multistreamplayer.media_source.TwitchMediaSource
+import com.android.multistreamplayer.media_source.TwitchMediaSource.Companion.TWITCH_URL
+import com.android.multistreamplayer.player.MultiStreamPlayer
 import com.android.multistreamplayer.settings.ResourceListener
 import com.android.multistreamplayer.settings.SettingsLayout
 import com.android.multistreamplayer.settings.animations.ExpandAnimation
@@ -50,7 +51,11 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
 
     private var playerView: PlayerView? = null
     private var chatList: RecyclerView? = null
-    private var chatAdapter: ChatAdapter? = null
+    var chatAdapter: ChatAdapter? = null
+    set(value) {
+        field = value
+        chatList?.adapter = value
+    }
     private var chat: Chat? = null
     private var settings: SettingsLayout? = null
     private var settingsScrollView: ScrollView? = null
@@ -69,7 +74,9 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
                 R.styleable.MultiStreamPlayerLayout_playerType,
                 LIVE_STREAM
             ).also { playerType ->
-                multiStreamPlayer = MultiStreamPlayer(context, playerType).also { it.chat = chat }
+                multiStreamPlayer = MultiStreamPlayer(context, playerType).also {
+                    it.chat = chat
+                }
             }
             addOnResourceReadyListener(object : ResourceListener {
                 val qualityHeader: String = context.getString(R.string.quality)
@@ -79,9 +86,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
                     if (settings == null || settings?.groups?.get(qualityHeader) != null) return
 
                     val size = player[0]?.length() ?: 0
-                    val groupItemsArray =
-                        Array<SelectionGroup.Builder.SelectionGroupItem?>(size) { null }
-
+                    val groupItemsArray = Array<SelectionGroup.Builder.SelectionGroupItem?>(size) { null }
                     val track = player[0]
 
                     for (i in 0 until size) {
@@ -123,53 +128,22 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         }
     }
 
-
-    private fun initChat(chatType: ChatType) {
+    @Suppress("UNCHECKED_CAST")
+    fun init(chatType:  ChatType) {
         chat = buildChat(chatType)
-
+        multiStreamPlayer.chat = chat
+        val mediaSource = when(chatType) {
+            is ChatType.TwitchChatType -> TwitchMediaSource(RetrofitInstance.getRetrofit(TWITCH_URL))
+            is ChatType.MixerChatType -> return
+        }
+        multiStreamPlayer.apply {
+            this.mediaSource = mediaSource as MediaSource<Any>
+            play(chat?.channelName ?: return)
+        }
     }
 
     private fun buildChat(chatType: ChatType): Chat {
-
         return ChatFactory.create(chatType, context)
-
-//       return Chat.Builder()
-//            .autoConnect(channelName)
-//            .setClient(Chat.HOST, Chat.PORT)
-//            .addDataListener(object :
-//                DataListener {
-//                override fun onReceive(message: ChatParser.Message) {
-//                    chatAdapter?.addLine(message)
-//                }
-//            })
-//            .addEmoteStateListener(object :
-//                EmoteStateListener<Int, TwitchEmotesManager.TwitchEmote> {
-//                override fun onStartFetch() {
-//
-//                }
-//
-//                override fun onEmotesFetched() {
-//
-//                }
-//
-//                override fun onDownload() {
-//
-//                }
-//
-//                override fun onFailed(throwable: Throwable?) {
-//
-//                }
-//
-//                override fun onComplete(emoteSet: List<TwitchEmotesManager.TwitchEmote>) {
-//
-//                }
-//            })
-//           .apply { if (username != null && token != null) {
-//               setUsername(username)
-//               setUserToken(token)
-//           } }
-//            .build(context)
-
     }
 
     override fun onFinishInflate() {
@@ -190,9 +164,9 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
             this.topToBottom = this@MultiStreamPlayerLayout.playerView?.id!!
             this.bottomToBottom = id
         }
-        chatAdapter = ChatAdapter().also {
-            chatList?.adapter = it
-        }
+
+        chatList?.adapter = chatAdapter
+
 
         alarmImageButton = playerView?.findViewById(R.id.alarm_icon)
 
@@ -222,10 +196,6 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
 
     private fun addOnResourceReadyListener(listener: ResourceListener) {
         multiStreamPlayer.controller?.listeners?.add(listener)
-    }
-
-    fun play(uri: String) {
-        multiStreamPlayer.play(uri)
     }
 
     fun playAnimation() {
