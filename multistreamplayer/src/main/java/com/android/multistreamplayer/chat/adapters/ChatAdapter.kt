@@ -1,19 +1,31 @@
 package com.android.multistreamplayer.chat.adapters
 
+import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.android.multistreamchat.chat.chat_parser.ChatParser
+import com.android.multistreamplayer.R
 import com.android.multistreamplayer.databinding.ChatLayoutBinding
 import com.bumptech.glide.Glide
 
-class ChatAdapter : RecyclerView.Adapter<ChatAdapter.MyViewHolder>() {
+class ChatAdapter(var context: Context) : RecyclerView.Adapter<ChatAdapter.MyViewHolder>() {
 
     var linesList: MutableList<ChatParser.Message> = mutableListOf()
 
+    var colorOne = ResourcesCompat.getColor(context.resources, R.color.colorSurface, context.theme)
+
+    var colorTwo = ResourcesCompat.getColor(context.resources, R.color.colorOnSurface, context.theme)
+
     class MyViewHolder(val binding: ChatLayoutBinding) : RecyclerView.ViewHolder(binding.root){
 
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return position % 2
     }
 
     fun addLine(line: ChatParser.Message?) {
@@ -26,6 +38,10 @@ class ChatAdapter : RecyclerView.Adapter<ChatAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val binding = ChatLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        when(viewType) {
+            0 -> binding.root.setBackgroundColor(colorOne)
+            else -> binding.root.setBackgroundColor(colorTwo)
+        }
         return MyViewHolder(
             binding
         )
