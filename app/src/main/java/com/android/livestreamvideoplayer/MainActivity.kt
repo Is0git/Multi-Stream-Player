@@ -13,7 +13,7 @@ import com.android.multistreamplayer.chat.adapters.ChatAdapter
 import com.android.multistreamplayer.chat.chat_factories.ChatType
 
 class MainActivity : AppCompatActivity() {
-    var channelName = "healthygamer_gg"
+    var channelName = "drdisrespect"
     var chatAdapter: ChatAdapter? = null
     lateinit var binding: ActivityMainBinding
     lateinit var videoService: VideoService

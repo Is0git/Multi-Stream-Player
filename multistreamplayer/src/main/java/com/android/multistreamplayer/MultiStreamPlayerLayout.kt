@@ -160,11 +160,6 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
 
         chatList = findViewById(R.id.chat)
 
-        chatList?.layoutParams = LayoutParams(MATCH_PARENT, MATCH_CONSTRAINT).apply {
-            this.topToBottom = this@MultiStreamPlayerLayout.playerView?.id!!
-            this.bottomToBottom = id
-        }
-
         chatList?.adapter = chatAdapter
 
 

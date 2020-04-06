@@ -38,10 +38,10 @@ class ChatAdapter(var context: Context) : RecyclerView.Adapter<ChatAdapter.MyVie
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val binding = ChatLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        when(viewType) {
-            0 -> binding.root.setBackgroundColor(colorOne)
-            else -> binding.root.setBackgroundColor(colorTwo)
-        }
+//        when(viewType) {
+//            0 -> binding.root.setBackgroundColor(colorOne)
+//            else -> binding.root.setBackgroundColor(colorTwo)
+//        }
         return MyViewHolder(
             binding
         )
