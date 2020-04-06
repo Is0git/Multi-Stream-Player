@@ -18,7 +18,7 @@ class ChatAdapter(var context: Context) : RecyclerView.Adapter<ChatAdapter.MyVie
 
     var colorOne = ResourcesCompat.getColor(context.resources, R.color.colorSurface, context.theme)
 
-    var colorTwo = ResourcesCompat.getColor(context.resources, R.color.colorOnSurface, context.theme)
+    var colorTwo = ResourcesCompat.getColor(context.resources, R.color.colorLight, context.theme)
 
     class MyViewHolder(val binding: ChatLayoutBinding) : RecyclerView.ViewHolder(binding.root){
 
