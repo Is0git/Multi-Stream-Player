@@ -52,7 +52,7 @@ class ChatAdapter(var context: Context) : RecyclerView.Adapter<ChatAdapter.MyVie
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
         holder.binding.user.apply {
-            text = linesList[position].username
+            text = linesList[position].username + ":"
             setTextColor(Color.parseColor(linesList[position].usernameColor))
         }
         holder.binding.text.text = if (linesList[position].spannableMessage.isNullOrEmpty()) linesList[position].message else linesList[position].spannableMessage

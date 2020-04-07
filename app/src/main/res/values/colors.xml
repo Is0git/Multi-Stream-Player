@@ -10,4 +10,5 @@
     <color name="colorOnPrimaryVariant">#4523F7</color>
     <color name="colorOnSecondaryVariant">#B43BFF</color>
     <color name="headlineShadowColor">#868585</color>
+    <color name="mtrl_textinput_default_box_stroke_color">#E3E2E2</color>
 </resources>
