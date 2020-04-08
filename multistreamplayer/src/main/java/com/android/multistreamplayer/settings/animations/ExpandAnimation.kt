@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 
-class ExpandAnimation(context: Context, transitionId: Int) {
+class ExpandAnimation(context: Context, transitionId: Int, animationController: AnimationController) : AnimationController  by animationController{
 
     var transition = TransitionInflater.from(context).inflateTransition(transitionId)
 
@@ -17,34 +17,7 @@ class ExpandAnimation(context: Context, transitionId: Int) {
 
         TransitionManager.beginDelayedTransition(rootView, transition)
             view.forEach {
-                if (isExpanded) hide(it) else expand(it)
+                if (isExpanded) hide(it, isExpanded).also { isExpanded = false } else expand(it, isExpanded).also { isExpanded = true }
             }
-    }
-
-    private fun expand(view: View?) {
-        view?.apply {
-            isExpanded = true
-           layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_CONSTRAINT).apply {
-                this.topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                this.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-            }
-            visibility = View.VISIBLE
-        }
-
-    }
-
-    private fun hide(view: View?) {
-        view?.apply {
-            isExpanded = false
-            layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, 0).apply {
-                this.topToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                this.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                this.endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-            }
-
-        }
-
     }
 }

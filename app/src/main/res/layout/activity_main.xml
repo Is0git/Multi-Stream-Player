@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <com.android.multistreamplayer.MultiStreamPlayerLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/channel_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            app:constraint_referenced_ids="channel_info_view, profile_image, title_text, channel_name, game_name, points_icon" />
 
         <com.google.android.exoplayer2.ui.PlayerView
             android:id="@+id/player"
@@ -19,66 +26,91 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toBottomOf="@id/channel_info_view"
-            app:layout_constraintBottom_toTopOf="@id/chatTextField"/>
+            app:layout_constraintBottom_toTopOf="@id/chatTextField"
+            app:layout_constraintTop_toBottomOf="@id/channel_info_view" />
 
         <View
             android:id="@+id/channel_info_view"
             android:layout_width="match_parent"
+            android:layout_height="100dp"
             android:background="@color/colorSurface"
-            app:layout_constraintTop_toBottomOf="@id/player"
             android:elevation="1dp"
-            android:layout_height="75dp"/>
+            app:layout_constraintTop_toBottomOf="@id/player" />
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profile_image"
             android:layout_width="45dp"
             android:layout_height="45dp"
-            android:src="@drawable/drd"
-            app:layout_constraintBottom_toBottomOf="@id/channel_info_view"
-            app:layout_constraintTop_toTopOf="@id/channel_info_view"
-            app:layout_constraintStart_toStartOf="@id/channel_info_view"
             android:layout_marginTop="10dp"
-            android:layout_marginStart="10dp"
-            android:elevation="1dp"
-            app:civ_border_width="2dp"
             android:layout_marginBottom="10dp"
-            app:civ_border_color="@color/colorOnSurface"/>
+            android:elevation="1dp"
+            android:src="@drawable/drd"
+            app:civ_border_color="@color/colorOnSurface"
+            app:civ_border_width="2dp"
+            app:layout_constraintBottom_toBottomOf="@id/channel_info_view"
+            app:layout_constraintStart_toStartOf="@id/start_guideline"
+            app:layout_constraintTop_toTopOf="@id/channel_info_view" />
 
         <com.google.android.material.textview.MaterialTextView
-            style="@style/TextAppearance.MaterialComponents.Headline6"
             android:id="@+id/title_text"
-            android:text="DROPS MAXIMIZED | @DRDISRESPECT"
-            android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="@id/profile_image"
-            app:layout_constraintStart_toEndOf="@id/profile_image"
-            app:layout_constraintEnd_toEndOf="@id/channel_info_view"
-            android:layout_marginStart="8dp"
+            style="@style/TextAppearance.MaterialComponents.Headline6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
             android:layout_marginEnd="8dp"
             android:elevation="1dp"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:lines="1"/>
+            android:lines="1"
+            android:text="DROPS MAXIMIZED | @DRDISRESPECT"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@id/points_icon"
+            app:layout_constraintStart_toEndOf="@id/profile_image"
+            app:layout_constraintTop_toTopOf="@id/channel_info_view" />
 
         <com.google.android.material.textview.MaterialTextView
-            style="@style/TextAppearance.MaterialComponents.Body1"
             android:id="@+id/channel_name"
-            android:text="DrDisrespect"
+            style="@style/TextAppearance.MaterialComponents.Body1"
             android:layout_width="0dp"
-            android:textStyle="bold"
-            android:elevation="1dp"
-            app:layout_constraintTop_toBottomOf="@id/title_text"
-            app:layout_constraintStart_toStartOf="@id/title_text"
-            app:layout_constraintEnd_toEndOf="@id/title_text"
-            app:layout_constraintBottom_toBottomOf="@id/profile_image"
             android:layout_height="wrap_content"
-            android:singleLine="true"/>
+            android:elevation="1dp"
+            android:singleLine="true"
+            android:text="DrDisrespect"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@id/title_text"
+            app:layout_constraintStart_toStartOf="@id/title_text"
+            app:layout_constraintTop_toBottomOf="@id/title_text" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/game_name"
+            style="@style/TextAppearance.MaterialComponents.Body2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:elevation="1dp"
+            android:lines="1"
+            android:text="Valorant"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/channel_info_view"
+            app:layout_constraintEnd_toEndOf="@id/channel_name"
+            app:layout_constraintStart_toStartOf="@id/channel_name"
+            app:layout_constraintTop_toBottomOf="@id/channel_name" />
+
+        <ImageButton
+            android:id="@+id/points_icon"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:elevation="1dp"
+            android:src="@drawable/stats_icon"
+            app:layout_constraintBottom_toBottomOf="@id/profile_image"
+            app:layout_constraintEnd_toEndOf="@id/end_guideline"
+            app:layout_constraintTop_toTopOf="@id/profile_image" />
 
         <ScrollView
             android:id="@+id/settings_scroll_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:background="?colorSurface"
+            android:elevation="3dp"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="@id/chatTextField">
 
@@ -89,26 +121,64 @@
         </ScrollView>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/ChatTextInput"
             android:id="@+id/chatTextField"
-            android:layout_width="match_parent"
+            style="@style/ChatTextInput"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            app:boxStrokeWidth="1dp"
-            app:endIconMode="password_toggle"
+            android:layout_marginBottom="24dp"
+            android:elevation="2dp"
+            android:hint="message"
+            app:boxBackgroundColor="@color/colorSurface"
+            app:boxBackgroundMode="outline"
             app:boxCornerRadiusBottomEnd="2dp"
             app:boxCornerRadiusBottomStart="2dp"
             app:boxCornerRadiusTopEnd="2dp"
             app:boxCornerRadiusTopStart="2dp"
-            app:boxBackgroundMode="outline"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:hint="message">
+            app:boxStrokeColor="@color/colorAccent"
+            app:boxStrokeWidth="1dp"
+            app:endIconDrawable="@drawable/ic_chat_emoticon"
+            app:endIconMode="custom"
+            app:layout_constraintBottom_toTopOf="@id/menu_drawer_icon"
+            app:layout_constraintEnd_toEndOf="@id/end_guideline"
+            app:layout_constraintStart_toStartOf="@id/start_guideline">
+
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageButton
+            android:id="@+id/menu_drawer_icon"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/menu_drawer_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/chatTextField" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/send_button"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/send"
+            app:layout_constraintBottom_toBottomOf="@id/menu_drawer_icon"
+            app:layout_constraintEnd_toEndOf="@id/chatTextField"
+            app:layout_constraintTop_toTopOf="@id/menu_drawer_icon" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/start_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="24dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/end_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_end="24dp" />
     </com.android.multistreamplayer.MultiStreamPlayerLayout>
 </layout>

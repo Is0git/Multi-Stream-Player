@@ -6,4 +6,8 @@
             <enum name="video" value="2"/>
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="BadgeView">
+        <attr name="size" format="dimension"/>
+    </declare-styleable>
 </resources>

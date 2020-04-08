@@ -1,9 +1,11 @@
 package com.android.multistreamplayer
 
 import android.content.Context
+import android.transition.TransitionManager
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.ScrollView
@@ -28,6 +30,7 @@ import com.android.multistreamplayer.media_source.TwitchMediaSource.Companion.TW
 import com.android.multistreamplayer.player.MultiStreamPlayer
 import com.android.multistreamplayer.settings.ResourceListener
 import com.android.multistreamplayer.settings.SettingsLayout
+import com.android.multistreamplayer.settings.animations.AnimationController
 import com.android.multistreamplayer.settings.animations.ExpandAnimation
 import com.android.multistreamplayer.settings.groups.Group
 import com.android.multistreamplayer.settings.groups.selection_group.SelectionGroup
@@ -50,17 +53,29 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
     lateinit var multiStreamPlayer: MultiStreamPlayer
 
     private var playerView: PlayerView? = null
-    private var chatList: RecyclerView? = null
+    var chatList: RecyclerView? = null
     var chatAdapter: ChatAdapter? = null
     set(value) {
         field = value
         chatList?.adapter = value
     }
     private var chat: Chat? = null
+
     private var settings: SettingsLayout? = null
     private var settingsScrollView: ScrollView? = null
     private var settingsIconView: ImageButton? = null
     private var settingsExpandAnimation: ExpandAnimation? = null
+
+    private var channelInfoView: View? = null
+    private var channelInfoViewExpandAnimation: ExpandAnimation? = null
+
+    private var profileImageView: View? = null
+
+    private var titleTextView: View? = null
+
+    private var gameNameView: View? = null
+
+    private var channelNameView: View? = null
 
     lateinit var alarm: Alarm
     var alarmImageButton: ImageButton? = null
@@ -154,6 +169,34 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
     private fun allocateViews() {
         playerView = findViewById(R.id.player)
 
+        profileImageView = findViewById(R.id.profile_image)
+
+        titleTextView = findViewById(R.id.title_text)
+
+        channelNameView = findViewById(R.id.channel_name)
+
+        gameNameView = findViewById(R.id.game_name)
+
+        channelInfoView = findViewById(R.id.channel_info_view)
+
+        val group: androidx.constraintlayout.widget.Group = findViewById(R.id.channel_group)
+
+        channelInfoViewExpandAnimation = ExpandAnimation(context, R.transition.expand_transition, object : AnimationController {
+            override fun expand(view: View?, isExpanded: Boolean) {
+                group.visibility = View.VISIBLE
+//                group.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+
+            }
+
+            override fun hide(view: View?, isExpanded: Boolean) {
+                group.visibility = View.GONE
+//                group.layoutParams = LayoutParams(WRAP_CONTENT, 0)
+            }
+
+        })
+
+        playerView?.setOnClickListener {  channelInfoViewExpandAnimation?.playAnimation(channelInfoView, rootView = this) }
+
         playerView?.player = multiStreamPlayer.player.apply {
             playWhenReady = true
         }
@@ -161,7 +204,6 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
         chatList = findViewById(R.id.chat)
 
         chatList?.adapter = chatAdapter
-
 
         alarmImageButton = playerView?.findViewById(R.id.alarm_icon)
 
@@ -171,8 +213,31 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver {
 
         settingsExpandAnimation = ExpandAnimation(
             context,
-            R.transition.expand_transition
-        ).also { settings?.expandAnimation = it }
+            R.transition.expand_transition, object : AnimationController  {
+                override fun expand(view: View?, isExpanded: Boolean) {
+                    view?.apply {
+                        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, MATCH_CONSTRAINT).apply {
+                            this.topToTop = LayoutParams.PARENT_ID
+                            this.bottomToBottom = LayoutParams.PARENT_ID
+                            this.startToStart = LayoutParams.PARENT_ID
+                            this.endToEnd = LayoutParams.PARENT_ID
+                        }
+                        visibility = View.VISIBLE
+                    }
+
+                }
+
+                override fun hide(view: View?, isExpanded: Boolean) {
+                    view?.apply {
+                        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, 0).apply {
+                            this.topToBottom = LayoutParams.PARENT_ID
+                            this.startToStart = LayoutParams.PARENT_ID
+                            this.endToEnd = LayoutParams.PARENT_ID
+                        }
+                    }
+                }
+
+            }).also { settings?.expandAnimation = it }
 
         settingsIconView?.setOnClickListener {
             playAnimation()

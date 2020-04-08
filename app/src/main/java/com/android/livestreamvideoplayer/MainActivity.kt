@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
                 DataListener {
                 override fun onReceive(message: ChatParser.Message) {
                     chatAdapter?.addLine(message)
+                    chatList?.smoothScrollToPosition(chatAdapter?.itemCount?.minus(1) ?: 0)
                 }
 
             }, null)

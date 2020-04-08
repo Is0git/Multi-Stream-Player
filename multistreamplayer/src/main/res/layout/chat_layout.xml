@@ -6,39 +6,44 @@
             android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:layout_height="wrap_content">
-            <ImageView
+
+            <com.android.multistreamplayer.ui.BadgeView
+                android:id="@+id/badge"
                 android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:layout_marginStart="16dp"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_height="0dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintBottom_toBottomOf="@id/user"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.02"
+                app:layout_constraintStart_toEndOf="@+id/user"
                 app:layout_constraintTop_toTopOf="@id/user"
-                android:id="@+id/badge"/>
+                app:size="25dp" />
+
             <com.google.android.material.textview.MaterialTextView
-                style="@style/TextAppearance.MaterialComponents.Body1"
                 android:id="@+id/user"
-                android:layout_width="0dp"
+                style="@style/TextAppearance.MaterialComponents.Body1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
+                android:layout_marginStart="16dp"
                 android:shadowColor="@color/colorOnSurface"
                 android:shadowDy="2"
                 android:shadowRadius="4"
                 android:text="HELLsO"
-                android:layout_marginEnd="16dp"
-                android:layout_marginStart="8dp"
-                app:layout_constraintStart_toEndOf="@id/badge"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textview.MaterialTextView
-                style="@style/TextAppearance.MaterialComponents.Body2"
                 android:id="@+id/text"
+                style="@style/TextAppearance.MaterialComponents.Body2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:textStyle="bold"
                 android:text="HELLO"
-                app:layout_constraintEnd_toEndOf="@id/user"
+                android:textStyle="bold"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@id/user"
-                app:layout_constraintTop_toBottomOf="@id/user"/>
+                app:layout_constraintTop_toBottomOf="@id/user" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

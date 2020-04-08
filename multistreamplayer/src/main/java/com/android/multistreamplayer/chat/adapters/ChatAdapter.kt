@@ -52,12 +52,12 @@ class ChatAdapter(var context: Context) : RecyclerView.Adapter<ChatAdapter.MyVie
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
         holder.binding.user.apply {
-            text = linesList[position].username + ":"
+            text = linesList[position].username
             setTextColor(Color.parseColor(linesList[position].usernameColor))
         }
         holder.binding.text.text = if (linesList[position].spannableMessage.isNullOrEmpty()) linesList[position].message else linesList[position].spannableMessage
-        if (linesList[position].badges != null && linesList[position].badges?.isNotEmpty()!!)
-            Glide.with(holder.binding.badge).load(linesList[position].badges?.get(0)).into(holder.binding.badge)
+        holder.binding.badge.addBadges(linesList[position].badges)
+
 
 
 //        holder.binding.text.setTextColor(Color.parseColor(linesList[position].usernameColor))

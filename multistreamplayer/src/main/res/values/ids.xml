@@ -4,6 +4,12 @@
     <item name="settings" type="id"/>
     <item name="back_button" type="id"/>
     <item name="settings_scroll_view" type="id"/>
+    <item name="channel_info_view" type="id"/>
+    <item name="profile_image" type="id"/>
+    <item name="title_text" type="id"/>
+    <item name="game_name" type="id"/>
+    <item name="channel_name" type="id"/>
+    <item name="channel_group" type="id"/>
 
     <item name="itemImage" type="id"/>
     <item name="textOne" type="id"/>
