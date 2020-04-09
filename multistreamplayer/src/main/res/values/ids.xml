@@ -10,6 +10,9 @@
     <item name="game_name" type="id"/>
     <item name="channel_name" type="id"/>
     <item name="channel_group" type="id"/>
+    <item name="menu_drawer_icon" type="id"/>
+    <item name="chatTextField" type="id"/>
+    <item name="start_guideline" type="id"/>
 
     <item name="itemImage" type="id"/>
     <item name="textOne" type="id"/>

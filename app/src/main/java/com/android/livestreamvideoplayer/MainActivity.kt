@@ -1,8 +1,10 @@
 package com.android.livestreamvideoplayer
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import com.android.livestreamvideoplayer.databinding.ActivityMainBinding
 import com.android.multistreamchat.chat.chat_parser.ChatParser
 import com.android.multistreamchat.chat.listeners.DataListener
@@ -11,16 +13,17 @@ import com.android.multistreamplayer.MultiStreamPlayerLayout
 import com.android.multistreamplayer.api.twitch.VideoService
 import com.android.multistreamplayer.chat.adapters.ChatAdapter
 import com.android.multistreamplayer.chat.chat_factories.ChatType
+import java.util.jar.Manifest
 
 class MainActivity : AppCompatActivity() {
-    var channelName = "summit1g"
+    var channelName = "cdnthe3rd"
     var chatAdapter: ChatAdapter? = null
-    lateinit var binding: ActivityMainBinding
+    lateinit var binding: ViewDataBinding
     lateinit var videoService: VideoService
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         chatAdapter = ChatAdapter(this)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding = if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) DataBindingUtil.setContentView(this, R.layout.activity_main) else DataBindingUtil.setContentView(this, R.layout.activity_main2)
         (binding.root as MultiStreamPlayerLayout).apply {
             chatAdapter = this@MainActivity.chatAdapter
             initAlarm(supportFragmentManager)
@@ -35,5 +38,10 @@ class MainActivity : AppCompatActivity() {
             init(chatType)
             registerLifeCycle(lifecycle)
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+      binding =  if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)  DataBindingUtil.setContentView(this, R.layout.activity_main) else  DataBindingUtil.setContentView(this, R.layout.activity_main2)
     }
 }
