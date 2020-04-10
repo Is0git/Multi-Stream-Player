@@ -1,6 +1,7 @@
 package com.android.multistreamplayer
 
 import android.content.Context
+import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
 import android.util.AttributeSet
 import android.view.GestureDetector
@@ -14,7 +15,9 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.MATCH_PARENT
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.constraintlayout.widget.Guideline
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -37,6 +40,10 @@ import com.android.multistreamplayer.settings.animations.AnimationController
 import com.android.multistreamplayer.settings.animations.ExpandAnimation
 import com.android.multistreamplayer.settings.groups.Group
 import com.android.multistreamplayer.settings.groups.selection_group.SelectionGroup
+import com.google.android.exoplayer2.BasePlayer
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.PlayerView
@@ -303,6 +310,13 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
                 if (resources.configuration.orientation == ORIENTATION_LANDSCAPE) chatExpeandAnimation?.playAnimation(chatTextInput, rootView = this@MultiStreamPlayerLayout)
                 return true
             }
+
+
+
+            override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+                channelInfoViewExpandAnimation?.playAnimation(channelInfoView, rootView = channelInfoView!!)
+                return super.onSingleTapConfirmed(e)
+            }
         })
 
         profileImageView?.setOnClickListener { chatInputAnimation?.playAnimation(chatTextInput, rootView = this@MultiStreamPlayerLayout) }
@@ -316,7 +330,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
         }
 
         playerView?.apply {
-            setOnClickListener {  channelInfoViewExpandAnimation?.playAnimation(channelInfoView, rootView = channelInfoView!!) }
+//            setOnClickListener {  channelInfoViewExpandAnimation?.playAnimation(channelInfoView, rootView = channelInfoView!!) }
             this.setOnTouchListener(this@MultiStreamPlayerLayout)
         }
     }
@@ -359,6 +373,15 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
             stop()
             release()
         }
+    }
+
+    fun onRotation(config: Configuration?) {
+        config?.let {
+            val constraintSet = ConstraintSet()
+            if(config.orientation == Configuration.ORIENTATION_PORTRAIT) constraintSet.clone(context, R.layout.player_layout) else  constraintSet.clone(context, R.layout.player_layout_land)
+            constraintSet.applyTo(this)
+        }
+
     }
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {

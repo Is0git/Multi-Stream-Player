@@ -3,9 +3,9 @@ package com.android.livestreamvideoplayer
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
-import com.android.livestreamvideoplayer.databinding.ActivityMainBinding
 import com.android.multistreamchat.chat.chat_parser.ChatParser
 import com.android.multistreamchat.chat.listeners.DataListener
 
@@ -13,17 +13,16 @@ import com.android.multistreamplayer.MultiStreamPlayerLayout
 import com.android.multistreamplayer.api.twitch.VideoService
 import com.android.multistreamplayer.chat.adapters.ChatAdapter
 import com.android.multistreamplayer.chat.chat_factories.ChatType
-import java.util.jar.Manifest
 
 class MainActivity : AppCompatActivity() {
-    var channelName = "cdnthe3rd"
+    var channelName = "xqcow"
     var chatAdapter: ChatAdapter? = null
     lateinit var binding: ViewDataBinding
     lateinit var videoService: VideoService
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         chatAdapter = ChatAdapter(this)
-        binding = if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) DataBindingUtil.setContentView(this, R.layout.activity_main) else DataBindingUtil.setContentView(this, R.layout.activity_main2)
+        binding = if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) DataBindingUtil.setContentView(this, R.layout.player_layout) else DataBindingUtil.setContentView(this, R.layout.player_layout_land)
         (binding.root as MultiStreamPlayerLayout).apply {
             chatAdapter = this@MainActivity.chatAdapter
             initAlarm(supportFragmentManager)
@@ -42,6 +41,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-      binding =  if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)  DataBindingUtil.setContentView(this, R.layout.activity_main) else  DataBindingUtil.setContentView(this, R.layout.activity_main2)
+        (binding.root as MultiStreamPlayerLayout).onRotation(newConfig)
+
     }
 }
