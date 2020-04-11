@@ -2,7 +2,7 @@ package com.android.multistreamplayer.player
 
 import android.content.Context
 import android.net.Uri
-import com.android.multistreamplayer.settings.ResourceListener
+import com.android.multistreamplayer.listeners.ResourceListener
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
@@ -31,18 +31,24 @@ abstract class MultiStreamController(val ctx: Context, val player: SimpleExoPlay
         url: Uri
     ): MediaSource
 
-    fun addListener(listener: Player.EventListener) {
+     private fun addListener(listener: Player.EventListener) {
         this.listener = listener
         player.addListener(this.listener)
     }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
         super.onPlayerStateChanged(playWhenReady, playbackState)
-        if (playbackState == Player.STATE_READY) {
-            listeners.forEach {
-                it.onResourceTracksReady(player.currentTrackSelections)
+
+        listeners.forEach {
+            when(playbackState) {
+                Player.STATE_READY -> it.onResourceTracksReady(player.currentTrackSelections)
+                Player.STATE_BUFFERING -> it.onStateBuffering()
+                Player.STATE_IDLE -> it.onStateIdle()
+                Player.STATE_ENDED -> it.onStateFinish()
             }
+
         }
+
     }
 
     override fun onTracksChanged(

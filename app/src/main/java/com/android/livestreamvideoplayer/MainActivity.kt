@@ -15,8 +15,8 @@ import com.android.multistreamplayer.chat.adapters.ChatAdapter
 import com.android.multistreamplayer.chat.chat_factories.ChatType
 
 class MainActivity : AppCompatActivity() {
-    var channelName = "xqcow"
-    var chatAdapter: ChatAdapter? = null
+    private var channelName = "nmplol"
+    private var chatAdapter: ChatAdapter? = null
     lateinit var binding: ViewDataBinding
     lateinit var videoService: VideoService
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         (binding.root as MultiStreamPlayerLayout).apply {
             chatAdapter = this@MainActivity.chatAdapter
             initAlarm(supportFragmentManager)
-            val chatType = ChatType.TwitchChatType("is0xxx", "7uyg0kooxcagt096sig5f2i023mrdk", channelName, object :
+            val chatType = ChatType.TwitchChatType("wicked", "7uyg0kooxcagt096sig5f2i023mrdk", channelName, object :
                 DataListener {
                 override fun onReceive(message: ChatParser.Message) {
                     chatAdapter?.addLine(message)
