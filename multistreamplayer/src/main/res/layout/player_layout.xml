@@ -190,5 +190,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_end="24dp" />
+
+        <com.example.multistreamemotespicker.EmoticonPickerLayout
+            android:id="@+id/emoticon_picker"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:minHeight="200dp"
+            android:visibility="gone"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toTopOf="@id/chatTextField"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="@id/chatTextField"
+            app:layout_constraintEnd_toEndOf="@id/chatTextField"
+            android:elevation="4dp"/>
     </com.android.multistreamplayer.MultiStreamPlayerLayout>
 </layout>

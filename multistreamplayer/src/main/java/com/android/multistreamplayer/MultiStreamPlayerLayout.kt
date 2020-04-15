@@ -9,21 +9,29 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.*
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.constraintlayout.widget.Guideline
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.recyclerview.widget.RecyclerView
 import com.android.multistreamchat.chat.Chat
+import com.android.multistreamchat.chat.chat_emotes.EmotesManager
+import com.android.multistreamchat.chat.chat_parser.ChatParser
+import com.android.multistreamchat.chat.listeners.DataListener
+import com.android.multistreamchat.chat.listeners.EmoteStateListener
 import com.android.multistreamchat.twitch_chat.api.RetrofitInstance
+import com.android.multistreamchat.twitch_chat.api.twitch.models.Emotes.Emote
+import com.android.multistreamchat.twitch_chat.chat_emotes.TwitchEmotesManager
 import com.android.multistreamplayer.alarm.Alarm
 import com.android.multistreamplayer.chat.adapters.ChatAdapter
 import com.android.multistreamplayer.chat.chat_factories.ChatFactory
-import com.android.multistreamplayer.chat.chat_factories.ChatType
+import com.android.multistreamplayer.chat.chat_factories.PlayerType
 import com.android.multistreamplayer.media_source.MediaSource
 import com.android.multistreamplayer.media_source.TwitchMediaSource
 import com.android.multistreamplayer.media_source.TwitchMediaSource.Companion.TWITCH_URL
@@ -35,16 +43,23 @@ import com.android.multistreamplayer.settings.animations.AnimationController
 import com.android.multistreamplayer.settings.animations.ExpandAnimation
 import com.android.multistreamplayer.settings.groups.Group
 import com.android.multistreamplayer.settings.groups.selection_group.SelectionGroup
+import com.bumptech.glide.Glide
+import com.example.multistreamemotespicker.EmoticonPickerLayout
+import com.example.multistreamemotespicker.adapters.EmotesViewpagerAdapter
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouchListener {
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-        init(context, attrs)
+        initializePlayer(context, attrs)
     }
 
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
@@ -56,12 +71,15 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
     lateinit var multiStreamPlayer: MultiStreamPlayer
 
     private var playerView: PlayerView? = null
+
     var chatList: RecyclerView? = null
+
     var chatAdapter: ChatAdapter? = null
         set(value) {
             field = value
             chatList?.adapter = value
         }
+
     private var chat: Chat? = null
     private var chatExpandAnimation: ExpandAnimation? = null
 
@@ -89,6 +107,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
     private var playerGestureDetector: GestureDetector? = null
 
     lateinit var alarm: Alarm
+
     var alarmImageButton: ImageButton? = null
 
     private var startGuideline: Guideline? = null
@@ -101,7 +120,22 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
 
     private var scaleGestureDetector: ScaleGestureDetector? = null
 
-    private fun init(context: Context?, attrs: AttributeSet? = null) {
+    private var emoticonPickerLayout: EmoticonPickerLayout? = null
+    private var emoticonPickerExpandAnimation: ExpandAnimation? = null
+
+    var emoteViewpagerAdapter: EmotesViewpagerAdapter<EmotesManager.Emote>? = null
+
+    override fun onFinishInflate() {
+        super.onFinishInflate()
+        allocateViews()
+        setViewsParams()
+        setAdapters()
+        setupViewAnimations()
+        setUserInteraction()
+    }
+
+
+    private fun initializePlayer(context: Context?, attrs: AttributeSet? = null) {
 
         context?.obtainStyledAttributes(attrs, R.styleable.MultiStreamPlayerLayout)?.apply {
             playerType = getInt(
@@ -177,12 +211,20 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun init(chatType: ChatType) {
+    fun initializePlayer(chatType: PlayerType, lifecycle: Lifecycle? = null) {
+        lifecycle?.let {
+            registerLifeCycle(it)
+        } ?: if (context is AppCompatActivity) registerLifeCycle((context as AppCompatActivity).lifecycle) else throw InstantiationException("lifecycle is not registered")
+
         chat = buildChat(chatType)
         multiStreamPlayer.chat = chat
         val mediaSource = when (chatType) {
-            is ChatType.TwitchChatType -> TwitchMediaSource(RetrofitInstance.getRetrofit(TWITCH_URL))
-            is ChatType.MixerChatType -> return
+            is PlayerType.TwitchChatType -> TwitchMediaSource(
+                RetrofitInstance.getRetrofit(
+                    TWITCH_URL
+                )
+            )
+            is PlayerType.MixerPlayerType -> return
         }
         multiStreamPlayer.apply {
             this.mediaSource = mediaSource as MediaSource<Any>
@@ -190,56 +232,64 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
         }
     }
 
-    private fun buildChat(chatType: ChatType): Chat {
-        return ChatFactory.create(chatType, context)
+    private fun buildChat(chatType: PlayerType): Chat {
+        addDefaultListeners(chatType)
+        return ChatFactory.create(chatType, context).apply {
+
+        }
+
     }
 
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        allocateViews()
+    private fun addDefaultListeners(chatType: PlayerType) {
+        chatType.dataListener = object : DataListener {
+            override fun onReceive(message: ChatParser.Message) {
+                chatAdapter?.addLine(message)
+                chatList?.smoothScrollToPosition(chatAdapter?.itemCount?.minus(1) ?: 0)
+            }
+        }
+
+        chatType.emoteStateListener = object :
+            EmoteStateListener<String, TwitchEmotesManager.TwitchEmote> {
+            override fun onComplete(emoteSet: List<TwitchEmotesManager.TwitchEmote>) {
+                putChatData("Something", emoteSet)
+            }
+
+            override fun onDownload() {
+
+            }
+
+            override fun onEmotesFetched() {
+
+            }
+
+            override fun onFailed(throwable: Throwable?) {
+
+            }
+
+            override fun onStartFetch() {
+
+            }
+
+        }
+    }
+
+    private fun setAdapters() {
         chatList?.adapter = chatAdapter
-        setupViewAnimations()
-        setUserInteraction()
-    }
 
-    private fun allocateViews() {
-        playerView = findViewById(R.id.player)
+        emoteViewpagerAdapter =
+            EmotesViewpagerAdapter({ holder: EmotesViewpagerAdapter.MyViewHolder<EmotesManager.Emote>?, item: List<EmotesManager.Emote>?, position: Int ->
+                val name: String = when (position) {
+                    0 -> "Global Emotes"
+                    1 -> "Bttw"
+                    else -> "Search"
+                }
+                holder?.emoteSetName?.text = name
+                holder?.adapter?.emotesList = item
+            }, { holder, dataItem ->
+                Glide.with(this).load(dataItem.imageUrl).into(holder.emoteImage)
+            })
 
-        chatTextInput = findViewById(R.id.chatTextField)
-
-        channelInfoView = findViewById(R.id.channel_info_view)
-
-        startGuideline = findViewById(R.id.start_guideline)
-
-        channelInfoView.apply {
-            profileImageView = this?.findViewById(R.id.profile_image)
-
-            titleTextView = this?.findViewById(R.id.title_text)
-
-            channelNameView = this?.findViewById(R.id.channel_name)
-
-            gameNameView = this?.findViewById(R.id.game_name)
-        }
-
-        playerView?.player = multiStreamPlayer.player.apply {
-            playWhenReady = true
-        }
-
-        chatList = findViewById(R.id.chat)
-
-        alarmImageButton = playerView?.findViewById(R.id.alarm_icon)
-
-        settingsScrollView = findViewById(R.id.settings_scroll_view)
-        settings = settingsScrollView?.findViewById(R.id.settings)
-        settingsIconView = playerView?.findViewById(R.id.settings_icon)
-
-        chatMenuDrawer = findViewById(R.id.menu_drawer_icon)
-
-        videoProgressBar = findViewById(R.id.video_progress_bar)
-
-        sendButton = findViewById(R.id.send_button)
-
-        sendButton?.setOnClickListener { typeMessage() }
+        chatAdapter = ChatAdapter(context)
     }
 
     private fun setupViewAnimations() {
@@ -253,7 +303,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
 
                 override fun hide(view: View?, isExpanded: Boolean) {
                     view?.apply {
-                        (layoutParams as LayoutParams).topToBottom = LayoutParams.PARENT_ID
+                        (layoutParams as LayoutParams).topToBottom = PARENT_ID
                     }
                 }
             })
@@ -279,10 +329,10 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
                 override fun expand(view: View?, isExpanded: Boolean) {
                     view?.apply {
                         layoutParams = LayoutParams(MATCH_PARENT, MATCH_CONSTRAINT).apply {
-                            this.topToTop = LayoutParams.PARENT_ID
-                            this.bottomToBottom = LayoutParams.PARENT_ID
-                            this.startToStart = LayoutParams.PARENT_ID
-                            this.endToEnd = LayoutParams.PARENT_ID
+                            this.topToTop = PARENT_ID
+                            this.bottomToBottom = PARENT_ID
+                            this.startToStart = PARENT_ID
+                            this.endToEnd = PARENT_ID
                         }
                         visibility = View.VISIBLE
                     }
@@ -292,9 +342,9 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
                 override fun hide(view: View?, isExpanded: Boolean) {
                     view?.apply {
                         layoutParams = LayoutParams(MATCH_PARENT, 0).apply {
-                            this.topToBottom = LayoutParams.PARENT_ID
-                            this.startToStart = LayoutParams.PARENT_ID
-                            this.endToEnd = LayoutParams.PARENT_ID
+                            this.topToBottom = PARENT_ID
+                            this.startToStart = PARENT_ID
+                            this.endToEnd = PARENT_ID
                         }
                     }
                 }
@@ -317,7 +367,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
                 }
 
                 override fun hide(view: View?, isExpanded: Boolean) {
-                    val chatLayoutParams=  chatList?.layoutParams
+                    val chatLayoutParams = chatList?.layoutParams
                     (chatLayoutParams as LayoutParams).apply {
                         width = chatWidth
                         topToTop = PARENT_ID
@@ -329,6 +379,17 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
                 }
             })
 
+        emoticonPickerExpandAnimation =
+            ExpandAnimation(context, R.transition.expand_transition, object : AnimationController {
+                override fun expand(view: View?, isExpanded: Boolean) {
+                    view?.visibility = View.VISIBLE
+                }
+
+                override fun hide(view: View?, isExpanded: Boolean) {
+                    view?.visibility = View.GONE
+                }
+
+            })
     }
 
     private fun setUserInteraction() {
@@ -393,6 +454,40 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
                 }
 
             })
+
+        emoticonPickerLayout?.apply {
+            onSearchTextChange = { text: String? ->
+                CoroutineScope(Dispatchers.Default).launch {
+                    emoteViewpagerAdapter?.searchItem(text!!, chat?.getAllEmotes())
+                }
+            }
+            emotesViewPager?.adapter = emoteViewpagerAdapter
+            TabLayoutMediator(emotesTabLayout!!, emotesViewPager!!) { tab, position ->
+                val name: String = when (position) {
+                    0 -> "Global Emotes"
+                    else -> "Search"
+                }
+                tab.text = name
+            }.attach()
+        }
+
+        chatTextInput?.setEndIconOnClickListener {
+            emoticonPickerExpandAnimation?.playAnimation(
+                emoticonPickerLayout,
+                rootView = this
+            )
+        }
+    }
+
+
+    private fun setViewsParams() {
+        emoticonPickerLayout?.setBackgroundColor(
+            ResourcesCompat.getColor(
+                resources,
+                R.color.colorSurface,
+                null
+            )
+        )
     }
 
     fun initAlarm(supportFragmentManager: FragmentManager) {
@@ -433,7 +528,9 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
             stop()
             release()
         }
+        chat?.clear()
     }
+
 
     fun onRotation(config: Configuration?) {
         config?.let {
@@ -457,6 +554,52 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
 
     fun isOrientationLandscape(): Boolean {
         return resources.configuration.orientation == ORIENTATION_LANDSCAPE
+    }
+
+    fun putChatData(data: String, emote: List<EmotesManager.Emote>) {
+        emoteViewpagerAdapter?.putData(data, emote)
+    }
+
+    private fun allocateViews() {
+        playerView = findViewById(R.id.player)
+
+        chatTextInput = findViewById(R.id.chatTextField)
+
+        channelInfoView = findViewById(R.id.channel_info_view)
+
+        startGuideline = findViewById(R.id.start_guideline)
+
+        channelInfoView.apply {
+            profileImageView = this?.findViewById(R.id.profile_image)
+
+            titleTextView = this?.findViewById(R.id.title_text)
+
+            channelNameView = this?.findViewById(R.id.channel_name)
+
+            gameNameView = this?.findViewById(R.id.game_name)
+        }
+
+        playerView?.player = multiStreamPlayer.player.apply {
+            playWhenReady = true
+        }
+
+        chatList = findViewById(R.id.chat)
+
+        alarmImageButton = playerView?.findViewById(R.id.alarm_icon)
+
+        settingsScrollView = findViewById(R.id.settings_scroll_view)
+        settings = settingsScrollView?.findViewById(R.id.settings)
+        settingsIconView = playerView?.findViewById(R.id.settings_icon)
+
+        chatMenuDrawer = findViewById(R.id.menu_drawer_icon)
+
+        videoProgressBar = findViewById(R.id.video_progress_bar)
+
+        sendButton = findViewById(R.id.send_button)
+
+        sendButton?.setOnClickListener { typeMessage() }
+
+        emoticonPickerLayout = findViewById(R.id.emoticon_picker)
     }
 }
 

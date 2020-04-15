@@ -6,16 +6,16 @@ import com.android.multistreamchat.chat.Chat
 object ChatFactory {
 
 
-    fun create(chatType: ChatType, context: Context): Chat {
+    fun create(chatType: PlayerType, context: Context): Chat {
         return when (chatType) {
-            is ChatType.TwitchChatType -> createTwitchChat(chatType, context)
-            is ChatType.MixerChatType -> createMixerChat(chatType, context)
+            is PlayerType.TwitchChatType -> createTwitchChat(chatType, context)
+            is PlayerType.MixerPlayerType -> createMixerChat(chatType, context)
         }
     }
 
 
     private fun createTwitchChat(
-        chatType: ChatType.TwitchChatType,
+        chatType: PlayerType.TwitchChatType,
         context: Context
     ): Chat {
 
@@ -37,7 +37,7 @@ object ChatFactory {
 
     }
 
-    private fun createMixerChat(chatType: ChatType.MixerChatType, context: Context): Chat {
+    private fun createMixerChat(chatType: PlayerType.MixerPlayerType, context: Context): Chat {
         return Chat.Builder().build(context)
     }
 }
