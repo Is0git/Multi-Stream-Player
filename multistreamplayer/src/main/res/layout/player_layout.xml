@@ -64,7 +64,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="8dp"
                 android:elevation="1dp"
-                android:text="DROPS MAXIMIZED | @DRDISRESPECT"
+                android:text="TITLE"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toStartOf="@id/points_icon"
                 app:layout_constraintStart_toEndOf="@id/profile_image"

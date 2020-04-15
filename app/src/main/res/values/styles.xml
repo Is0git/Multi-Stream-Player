@@ -10,8 +10,5 @@
         <item name="android:windowFullscreen">true</item>
         <item name="dialogTheme">@style/Theme.AppCompat</item>
     </style>
-        <style name="ChatTextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-            <item name="boxStrokeColor">@color/colorOnPrimaryVariant</item>
-            <item name="boxStrokeWidth">2dp</item>
-        </style>
+
 </resources>

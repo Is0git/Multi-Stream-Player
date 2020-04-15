@@ -9,14 +9,14 @@
         android:id="@+id/exo_play"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:backgroundTint="#ffffff"
+        android:backgroundTint="@color/colorSurface"
         android:background="@drawable/play_icon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
     <ImageButton
         android:id="@+id/exo_pause"
         android:layout_width="30dp"
-        android:backgroundTint="#ffffff"
+        android:backgroundTint="@color/colorSurface"
         android:layout_height="30dp"
         android:background="@drawable/pause_icon"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -26,7 +26,7 @@
         android:id="@+id/icon_love"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:backgroundTint="#ffffff"
+        android:backgroundTint="@color/colorSurface"
         android:background="@drawable/love_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -37,7 +37,7 @@
         android:layout_height="30dp"
         android:background="@drawable/alarm_icon"
         android:layout_marginEnd="10dp"
-        android:backgroundTint="#ffffff"
+        android:backgroundTint="@color/colorSurface"
         app:layout_constraintEnd_toStartOf="@+id/icon_love"
         app:layout_constraintTop_toTopOf="@+id/icon_love" />
 
@@ -45,7 +45,7 @@
         android:id="@+id/settings_icon"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:backgroundTint="#ffffff"
+        android:backgroundTint="@color/colorSurface"
         android:background="@drawable/settings_icon"
         android:layout_marginEnd="10dp"
         app:layout_constraintEnd_toStartOf="@+id/alarm_icon"
@@ -54,7 +54,7 @@
     <ImageButton
         android:id="@+id/fullscreen_icon"
         android:layout_width="30dp"
-        android:backgroundTint="#ffffff"
+        android:backgroundTint="@color/colorSurface"
         android:layout_height="30dp"
         android:background="@drawable/fullscreen_icon"
         app:layout_constraintBottom_toBottomOf="@+id/exo_play"
@@ -64,7 +64,7 @@
         android:id="@+id/down_icon"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:backgroundTint="#ffffff"
+        android:backgroundTint="@color/colorSurface"
         android:background="@drawable/arrow_down"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

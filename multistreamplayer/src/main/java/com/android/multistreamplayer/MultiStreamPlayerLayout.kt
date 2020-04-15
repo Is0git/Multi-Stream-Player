@@ -180,7 +180,6 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
                                 View.VISIBLE
                             playAnimation()
                             multiStreamPlayer.buildTracksParams(track, position)
-                            Toast.makeText(context, "CLICKED: $position", Toast.LENGTH_SHORT).show()
                         }
                         .build()
 

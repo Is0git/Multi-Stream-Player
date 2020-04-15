@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">MultiStreamPlayer</string>
     <string name="quality">QUALITY</string>
+    <string name="send">SEND</string>
+    <string name="hello">HELLO</string>
+    <string name="hellso">HELLsO</string>
 </resources>
