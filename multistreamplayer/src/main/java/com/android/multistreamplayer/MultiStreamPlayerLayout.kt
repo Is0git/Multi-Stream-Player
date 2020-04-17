@@ -3,6 +3,7 @@ package com.android.multistreamplayer
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -136,7 +137,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
 
 
     private fun initializePlayer(context: Context?, attrs: AttributeSet? = null) {
-
+        setBackgroundColor(ResourcesCompat.getColor(resources, R.color.colorSurface, null))
         context?.obtainStyledAttributes(attrs, R.styleable.MultiStreamPlayerLayout)?.apply {
             playerType = getInt(
                 R.styleable.MultiStreamPlayerLayout_playerType,
