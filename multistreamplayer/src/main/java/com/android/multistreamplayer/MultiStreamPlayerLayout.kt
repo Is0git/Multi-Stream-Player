@@ -3,7 +3,6 @@ package com.android.multistreamplayer
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -27,7 +26,6 @@ import com.android.multistreamchat.chat.chat_parser.ChatParser
 import com.android.multistreamchat.chat.listeners.DataListener
 import com.android.multistreamchat.chat.listeners.EmoteStateListener
 import com.android.multistreamchat.twitch_chat.api.RetrofitInstance
-import com.android.multistreamchat.twitch_chat.api.twitch.models.Emotes.Emote
 import com.android.multistreamchat.twitch_chat.chat_emotes.TwitchEmotesManager
 import com.android.multistreamplayer.alarm.Alarm
 import com.android.multistreamplayer.chat.adapters.ChatAdapter
@@ -92,13 +90,13 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
     private var channelInfoView: ConstraintLayout? = null
     private var channelInfoViewExpandAnimation: ExpandAnimation? = null
 
-    private var profileImageView: View? = null
+    private var profileImageView: ImageView? = null
 
-    private var titleTextView: View? = null
+    private var titleTextView: TextView? = null
 
-    private var gameNameView: View? = null
+    private var categoryView: TextView? = null
 
-    private var channelNameView: View? = null
+    private var channelNameView: TextView? = null
 
     private var chatInputAnimation: ExpandAnimation? = null
     private var chatMenuDrawer: ImageButton? = null
@@ -228,6 +226,10 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
         }
         multiStreamPlayer.apply {
             this.mediaSource = mediaSource as MediaSource<Any>
+            titleTextView?.text = chatType.title
+            channelNameView?.text = chatType.channelDisplayName
+            categoryView?.text = chatType.category
+            profileImageView?.let { Glide.with(context).load(chatType.imageUrl).centerInside().into(it) }
             play(chat?.channelName ?: return)
         }
     }
@@ -235,9 +237,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
     private fun buildChat(chatType: PlayerType): Chat {
         addDefaultListeners(chatType)
         return ChatFactory.create(chatType, context).apply {
-
         }
-
     }
 
     private fun addDefaultListeners(chatType: PlayerType) {
@@ -576,7 +576,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
 
             channelNameView = this?.findViewById(R.id.channel_name)
 
-            gameNameView = this?.findViewById(R.id.game_name)
+            categoryView = this?.findViewById(R.id.game_name)
         }
 
         playerView?.player = multiStreamPlayer.player.apply {

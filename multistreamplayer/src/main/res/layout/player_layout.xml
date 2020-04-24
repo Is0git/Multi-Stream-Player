@@ -47,7 +47,6 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:elevation="1dp"
-                android:src="@drawable/drd"
                 app:civ_border_color="@color/colorOnSurface"
                 app:civ_border_width="2dp"
                 app:layout_constraintBottom_toBottomOf="@id/channel_info_view"

@@ -23,8 +23,8 @@ object ChatFactory {
             .setClient(Chat.HOST, Chat.PORT)
             .apply {
                 if (chatType.username != null && chatType.token != null) {
-                    setUsername(chatType.username)
-                    setUserToken(chatType.token)
+                    setUsername(chatType.username!!)
+                    setUserToken(chatType.token!!)
                 }
                 chatType.channelName?.also { autoConnect(it) }
 
