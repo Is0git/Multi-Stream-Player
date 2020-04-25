@@ -28,6 +28,7 @@ class MultiStreamPlayer(val context: Context, playerType: Int) {
             context,
             player
         ) else VideoController(context, player)
+
     }
 
     fun play(channelKey: Any) {

@@ -3,11 +3,9 @@ package com.android.multistreamplayer
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
+import android.graphics.Color
 import android.util.AttributeSet
-import android.view.GestureDetector
-import android.view.MotionEvent
-import android.view.ScaleGestureDetector
-import android.view.View
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
