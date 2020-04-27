@@ -19,8 +19,8 @@ sealed class PlayerType(
         title: String? = null,
         channelDisplayName: String? = null,
         category: String? = null,
-        dataListener: DataListener? = null,
         imageUrl: String? = null,
+        dataListener: DataListener? = null,
         emoteStateListener: EmoteStateListener<String, TwitchEmotesManager.TwitchEmote>? = null
     ) :
         PlayerType(dataListener, emoteStateListener, title, channelDisplayName, category, imageUrl)

@@ -13,16 +13,11 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ViewDataBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) DataBindingUtil.setContentView(this, R.layout.player_layout) else DataBindingUtil.setContentView(this, R.layout.player_layout_land)
-        (binding.root as MultiStreamPlayerLayout).apply {
-            val playerType = PlayerType.TwitchChatType("wicked", "7uyg0kooxcagt096sig5f2i023mrdk", channelName)
-            initializePlayer(playerType)
-        }
+            setContentView(R.layout.activity_main)
+
+        supportFragmentManager.beginTransaction().replace(R.id.player_fragment_container, PlayerFragment()).commit()
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        (binding.root as MultiStreamPlayerLayout).onRotation(newConfig)
-    }
+
 
 }

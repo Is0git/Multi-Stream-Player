@@ -53,12 +53,11 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation project(":multistreamplayer")
-    implementation 'com.google.android.exoplayer:exoplayer:2.10.0'
-    implementation 'com.github.Is0git:Multi-Stream-Chat:0.1.7'
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     implementation 'com.google.android.material:material:1.2.0-alpha05'
+    implementation project(":multistreamplayer")
+    implementation 'com.github.Is0git:Multi-Stream-Chat:0.1.7'
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
 
