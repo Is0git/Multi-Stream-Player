@@ -57,7 +57,7 @@
         android:backgroundTint="@color/colorSurface"
         android:layout_height="30dp"
         android:background="@drawable/fullscreen_icon"
-        app:layout_constraintBottom_toBottomOf="@+id/exo_play"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <ImageButton

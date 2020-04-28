@@ -22,4 +22,7 @@
     <item name="textThree" type="id"/>
     <item name="selectionIcon" type="id"/>
     <item name="chat" type="id"/>
+    <item name="motion_layout" type="id"/>
+    <item name="start" type="id"/>
+    <item name="end" type="id"/>
 </resources>

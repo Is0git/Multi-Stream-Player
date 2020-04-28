@@ -1,5 +1,6 @@
 package com.android.multistreamplayer
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.content.res.Configuration.ORIENTATION_LANDSCAPE
@@ -8,6 +9,7 @@ import android.util.AttributeSet
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.*
 import androidx.constraintlayout.widget.ConstraintSet
@@ -49,6 +51,7 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.android.synthetic.main.player_layout.view.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,7 +70,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
 
     lateinit var multiStreamPlayer: MultiStreamPlayer
 
-    private var playerView: PlayerView? = null
+    var playerView: PlayerView? = null
 
     var chatList: RecyclerView? = null
 
@@ -80,26 +83,26 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
     private var chat: Chat? = null
     private var chatExpandAnimation: ExpandAnimation? = null
 
-    private var settings: SettingsLayout? = null
+    var settings: SettingsLayout? = null
     private var settingsScrollView: ScrollView? = null
-    private var settingsIconView: ImageButton? = null
-    private var settingsExpandAnimation: ExpandAnimation? = null
+    var settingsIconView: ImageButton? = null
+    var settingsExpandAnimation: ExpandAnimation? = null
 
-    private var channelInfoView: ConstraintLayout? = null
+    var channelInfoView: ConstraintLayout? = null
     private var channelInfoViewExpandAnimation: ExpandAnimation? = null
 
-    private var profileImageView: ImageView? = null
+    var profileImageView: ImageView? = null
 
-    private var titleTextView: TextView? = null
+    var titleTextView: TextView? = null
 
-    private var categoryView: TextView? = null
+    var categoryView: TextView? = null
 
-    private var channelNameView: TextView? = null
+    var channelNameView: TextView? = null
 
-    private var chatInputAnimation: ExpandAnimation? = null
-    private var chatMenuDrawer: ImageButton? = null
+    var chatInputAnimation: ExpandAnimation? = null
+    var chatMenuDrawer: ImageButton? = null
 
-    private var chatTextInput: TextInputLayout? = null
+    var chatTextInput: TextInputLayout? = null
 
     private var playerGestureDetector: GestureDetector? = null
 
@@ -107,17 +110,27 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
 
     var alarmImageButton: ImageButton? = null
 
+    var followButton: ImageButton? = null
+
+    var minimizeButton: ImageButton? = null
+
+    var fullscreenButton: ImageButton? = null
+
+    var playButton: View? = null
+
+    var pauseButton: View? = null
+
     private var startGuideline: Guideline? = null
 
     private var playerType: Int = LIVE_STREAM
 
-    private var videoProgressBar: ProgressBar? = null
+    var videoProgressBar: ProgressBar? = null
 
-    private var sendButton: Button? = null
+    var sendButton: Button? = null
 
     private var scaleGestureDetector: ScaleGestureDetector? = null
 
-    private var emoticonPickerLayout: EmoticonPickerLayout? = null
+    var emoticonPickerLayout: EmoticonPickerLayout? = null
     private var emoticonPickerExpandAnimation: ExpandAnimation? = null
 
     var emoteViewpagerAdapter: EmotesViewpagerAdapter<EmotesManager.Emote>? = null
@@ -210,7 +223,10 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
     fun initializePlayer(chatType: PlayerType, lifecycle: Lifecycle? = null) {
         lifecycle?.let {
             registerLifeCycle(it)
-        } ?: if (context is AppCompatActivity) registerLifeCycle((context as AppCompatActivity).lifecycle) else throw InstantiationException("lifecycle is not registered")
+        }
+            ?: if (context is AppCompatActivity) registerLifeCycle((context as AppCompatActivity).lifecycle) else throw InstantiationException(
+                "lifecycle is not registered"
+            )
 
         chat = buildChat(chatType)
         multiStreamPlayer.chat = chat
@@ -227,7 +243,9 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
             titleTextView?.text = chatType.title
             channelNameView?.text = chatType.channelDisplayName
             categoryView?.text = chatType.category
-            profileImageView?.let { Glide.with(context).load(chatType.imageUrl).centerInside().into(it) }
+            profileImageView?.let {
+                Glide.with(context).load(chatType.imageUrl).centerInside().into(it)
+            }
             play(chat?.channelName ?: return)
         }
     }
@@ -334,7 +352,6 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
                         }
                         visibility = View.VISIBLE
                     }
-
                 }
 
                 override fun hide(view: View?, isExpanded: Boolean) {
@@ -343,6 +360,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
                             this.topToBottom = PARENT_ID
                             this.startToStart = PARENT_ID
                             this.endToEnd = PARENT_ID
+                            this.bottomToBottom = PARENT_ID
                         }
                     }
                 }
@@ -410,6 +428,16 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
                     return super.onSingleTapConfirmed(e)
                 }
 
+
+                override fun onScroll(
+                    e1: MotionEvent?,
+                    e2: MotionEvent?,
+                    distanceX: Float,
+                    distanceY: Float
+                ): Boolean {
+                    (parent.parent as CustomMotion).isScrollable = false
+                    return super.onScroll(e1, e2, distanceX, distanceY)
+                }
             })
 
         profileImageView?.setOnClickListener {
@@ -429,6 +457,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
 
         playerView?.apply {
             this.setOnTouchListener(this@MultiStreamPlayerLayout)
+
         }
 
         scaleGestureDetector =
@@ -456,7 +485,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
         emoticonPickerLayout?.apply {
             onSearchTextChange = { text: String? ->
                 CoroutineScope(Dispatchers.Default).launch {
-                    emoteViewpagerAdapter?.searchItem(text!!, chat?.getAllEmotes())
+                    //                    emoteViewpagerAdapter?.searchItem(text!!, chat?.getAllEmotes())
                 }
             }
             emotesViewPager?.adapter = emoteViewpagerAdapter
@@ -546,6 +575,7 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
     }
 
     override fun onTouch(v: View?, event: MotionEvent?): Boolean {
+        (parent.parent as CustomMotion).isScrollable = false
         scaleGestureDetector?.onTouchEvent(event)
         return playerGestureDetector?.onTouchEvent(event)!!
     }
@@ -563,9 +593,19 @@ class MultiStreamPlayerLayout : ConstraintLayout, LifecycleObserver, View.OnTouc
 
         chatTextInput = findViewById(R.id.chatTextField)
 
+        followButton = player.findViewById(R.id.icon_love)
+
+        minimizeButton = player.findViewById(R.id.down_icon)
+
+        fullscreenButton = player.findViewById(R.id.fullscreen_icon)
+
         channelInfoView = findViewById(R.id.channel_info_view)
 
         startGuideline = findViewById(R.id.start_guideline)
+
+        playButton = findViewById(R.id.exo_play)
+
+        pauseButton = findViewById(R.id.exo_pause)
 
         channelInfoView.apply {
             profileImageView = this?.findViewById(R.id.profile_image)
