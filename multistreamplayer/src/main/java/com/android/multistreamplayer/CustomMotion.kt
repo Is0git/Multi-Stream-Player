@@ -12,16 +12,26 @@ import androidx.annotation.IdRes
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
+import androidx.fragment.app.FragmentManager
 import com.google.android.exoplayer2.ui.PlayerView
 
 class CustomMotion : MotionLayout, MotionLayout.TransitionListener {
+
+    companion object {
+        const val PLAYER_FULLSCREEN = 0
+        const val PLAYER_MINIMIZED = 1
+        const val PLAYER_HIDDEN = 2
+    }
+
     var isScrollable: Boolean = true
 
     var playerFragmentContainer: FrameLayout? = null
 
-    var currentTransitionId = R.id.start
+    var playerViewState = PLAYER_FULLSCREEN
 
-    private val includedViews: MutableList<Int> by lazy { mutableListOf<Int>()}
+    var transitionListener: TransitionListener? = null
+
+    private val includedViews: MutableList<Int> by lazy { mutableListOf<Int>() }
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
@@ -53,15 +63,20 @@ class CustomMotion : MotionLayout, MotionLayout.TransitionListener {
 
 
         Log.d("TSTS", isTouchEventOnLeftSide(containersLayout.playerView!!, event).toString())
-        if(isTouchEventOnLeftSide(containersLayout.playerView!!, event)) return false
+
+        if (playerViewState == PLAYER_FULLSCREEN && isTouchEventOnLeftSide(
+                containersLayout.playerView!!,
+                event
+            )
+        ) return false
 
         //when player fragment in idle state we need to make sure all touch events are passed to children
 
-        for(a in includedViews) {
-                val view = containersLayout.findViewById<View>(a)
-                if(isOverLapping(view, event)) {
-                    return false
-                }
+        for (a in includedViews) {
+            val view = containersLayout.findViewById<View>(a)
+            if (isOverLapping(view, event)) {
+                return false
+            }
         }
         return true
     }
@@ -90,8 +105,8 @@ class CustomMotion : MotionLayout, MotionLayout.TransitionListener {
         return Rect(
             windowPosition.first(),
             windowPosition[1],
-            (windowPosition.first() + windowPosition.first() + view.width) /2,
-            (windowPosition[1]   +  view.height)
+            (windowPosition.first() + windowPosition.first() + view.width) / 2,
+            (windowPosition[1] + view.height)
         ).let {
             it.contains(
                 event?.rawX?.toInt()!!,
@@ -100,16 +115,37 @@ class CustomMotion : MotionLayout, MotionLayout.TransitionListener {
         }
     }
 
+    fun setDefaultTransitionHandler(fragmentManager: FragmentManager) {
+        transitionListener = object : CustomMotion.TransitionListener {
+            override fun onFullScreen() {
+
+            }
+
+            override fun onMinimize() {
+            }
+
+            override fun onHide() {
+                val fragment = fragmentManager.findFragmentById(R.id.player_fragment)
+                fragment?.also {
+                    fragmentManager.beginTransaction().remove(it).commit()
+                }
+            }
+        }
+    }
+
     fun includeView(@IdRes viewId: Int) {
         includedViews.add(viewId)
     }
 
-    fun isViewIncluded(@IdRes viewId: Int) : Boolean {
-       return includedViews.contains(viewId)
+    fun isViewIncluded(@IdRes viewId: Int): Boolean {
+        return includedViews.contains(viewId)
     }
 
     private fun getPlayerLayout(): MultiStreamPlayerLayout? {
-        return playerFragmentContainer?.children?.first() as MultiStreamPlayerLayout?
+        playerFragmentContainer?.children?.apply {
+            return if (count() != 0) playerFragmentContainer?.children?.first() as MultiStreamPlayerLayout? else null
+        }
+        return null
     }
 
     override fun onTransitionTrigger(p0: MotionLayout?, p1: Int, p2: Boolean, p3: Float) {
@@ -123,7 +159,7 @@ class CustomMotion : MotionLayout, MotionLayout.TransitionListener {
     override fun onTransitionChange(p0: MotionLayout?, p1: Int, p2: Int, p3: Float) {
         val visibility = when {
             p3 > 0.50f -> View.INVISIBLE
-            p3 < 0.50f -> View.VISIBLE
+            p3 < 0.50f && p1 == R.id.start -> View.VISIBLE
             else -> return
         }
 
@@ -140,24 +176,62 @@ class CustomMotion : MotionLayout, MotionLayout.TransitionListener {
     }
 
     override fun onTransitionCompleted(p0: MotionLayout?, p1: Int) {
-        if (p1 == R.id.end) {
-            getPlayerLayout()?.apply {
-                (pauseButton?.layoutParams as LayoutParams).also {
-                    it.startToStart = LayoutParams.PARENT_ID
-                    it.endToEnd = LayoutParams.PARENT_ID
-                    it.topToTop = LayoutParams.PARENT_ID
-                    it.bottomToBottom = LayoutParams.PARENT_ID
-                    pauseButton?.layoutParams = it
-                }
+        val playerLayout = getPlayerLayout()
 
-                (playButton?.layoutParams as LayoutParams).also {
-                    it.startToStart = LayoutParams.PARENT_ID
-                    it.endToEnd = LayoutParams.PARENT_ID
-                    it.topToTop = LayoutParams.PARENT_ID
-                    it.bottomToBottom = LayoutParams.PARENT_ID
-                    playButton?.layoutParams = it
+        playerViewState = when (p1) {
+            R.id.start -> {
+                playerLayout?.apply {
+                    (pauseButton?.layoutParams as LayoutParams).also {
+                        it.startToStart = LayoutParams.PARENT_ID
+                        it.endToEnd = LayoutParams.UNSET
+                        it.topToTop = LayoutParams.UNSET
+                        it.bottomToBottom = LayoutParams.PARENT_ID
+                        pauseButton?.layoutParams = it
+                    }
+
+                    (playButton?.layoutParams as LayoutParams).also {
+                        it.startToStart = LayoutParams.PARENT_ID
+                        it.endToEnd = LayoutParams.UNSET
+                        it.topToTop = LayoutParams.UNSET
+                        it.bottomToBottom = LayoutParams.PARENT_ID
+                        playButton?.layoutParams = it
+                    }
                 }
+                PLAYER_FULLSCREEN
             }
+            R.id.end -> {
+                playerLayout?.apply {
+                    (pauseButton?.layoutParams as LayoutParams).also {
+                        it.startToStart = LayoutParams.PARENT_ID
+                        it.endToEnd = LayoutParams.PARENT_ID
+                        it.topToTop = LayoutParams.PARENT_ID
+                        it.bottomToBottom = LayoutParams.PARENT_ID
+                        pauseButton?.layoutParams = it
+                    }
+
+                    (playButton?.layoutParams as LayoutParams).also {
+                        it.startToStart = LayoutParams.PARENT_ID
+                        it.endToEnd = LayoutParams.PARENT_ID
+                        it.topToTop = LayoutParams.PARENT_ID
+                        it.bottomToBottom = LayoutParams.PARENT_ID
+                        playButton?.layoutParams = it
+                    }
+                }
+                PLAYER_MINIMIZED
+            }
+            R.id.slide -> {
+                transitionListener?.onHide()
+                PLAYER_HIDDEN
+            }
+            else -> PLAYER_FULLSCREEN
         }
+    }
+
+    interface TransitionListener {
+        fun onFullScreen()
+
+        fun onMinimize()
+
+        fun onHide()
     }
 }
