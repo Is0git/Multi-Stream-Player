@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/colorSurface"
+    android:layout_height="wrap_content"
+    android:elevation="3dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/chatTextField"
+        style="@style/ChatTextInput"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        android:elevation="2dp"
+        android:hint="message"
+        app:boxBackgroundColor="@color/colorSurface"
+        app:boxBackgroundMode="outline"
+        app:boxCornerRadiusBottomEnd="2dp"
+        app:boxCornerRadiusBottomStart="2dp"
+        app:boxCornerRadiusTopEnd="2dp"
+        app:boxCornerRadiusTopStart="2dp"
+        app:boxStrokeColor="@color/colorAccent"
+        app:boxStrokeWidth="1dp"
+        app:endIconDrawable="@drawable/ic_chat_emoticon"
+        app:endIconMode="custom"
+        app:hintEnabled="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/menu_drawer_icon"
+        app:layout_constraintTop_toBottomOf="@+id/info_icon">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:imeOptions="actionDone|flagNoExtractUi"
+            android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <ImageButton
+        android:id="@+id/menu_drawer_icon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="4dp"
+        android:background="@drawable/menu_drawer_icon"
+        app:layout_constraintBottom_toBottomOf="@id/chatTextField"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/chatTextField" />
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        app:layout_constraintEnd_toStartOf="parent"
+        android:id="@+id/send_button"
+        app:layout_constraintTop_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/info_icon"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/ic_info_icon"
+        android:tint="@color/colorPrimary"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/info_text"
+        style="@style/TextAppearance.MaterialComponents.Caption"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginEnd="8dp"
+        android:singleLine="true"
+        android:text="@android:string/untitled"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@id/info_icon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/info_icon"
+        app:layout_constraintTop_toTopOf="@id/info_icon" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

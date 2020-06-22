@@ -25,4 +25,10 @@
     <item name="motion_layout" type="id"/>
     <item name="start" type="id"/>
     <item name="end" type="id"/>
+    <item name="navigationDrawer" type="id"/>
+    <item name="navigationDrawerHide" type="id"/>
+    <item name="navigationDrawerExpand" type="id"/>
+    <item name="toolBar" type="id"/>
+    <item name="toolbar_layout" type="id"/>
+    toolbar_layout
 </resources>

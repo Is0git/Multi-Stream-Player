@@ -9,6 +9,7 @@
     <color name="colorBackground">#FFFFFF</color>
     <color name="colorOnPrimaryVariant">#4523F7</color>
     <color name="colorOnSecondaryVariant">#B43BFF</color>
-    <color name="headlineShadowColor">#868585</color>
     <color name="colorLight">#E3E2E2</color>
+    <color name="colorWhite">#ffffff</color>
+    <color name="chatColor">#ffffff</color>
 </resources>

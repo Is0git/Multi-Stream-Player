@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <Transition
+        android:id="@+id/fragment_minimize_transition"
+        app:constraintSetEnd="@id/end"
+        app:constraintSetStart="@id/start"
+        app:duration="@android:integer/config_longAnimTime"
+        app:motionInterpolator="easeInOut">
+
+        <KeyFrameSet>
+
+            <KeyAttribute
+                android:translationX="0dp"
+                app:framePosition="70"
+                app:motionTarget="@id/chat" />
+
+            <KeyAttribute
+                android:translationX="200dp"
+                app:framePosition="100"
+                app:motionTarget="@id/chat" />
+
+            <KeyAttribute
+                android:translationX="0dp"
+                app:framePosition="70"
+                app:motionTarget="@id/chatInputLayout" />
+
+            <KeyAttribute
+                android:translationX="200dp"
+                app:framePosition="100"
+                app:motionTarget="@id/chatInputLayout" />
+
+            <KeyPosition
+                app:framePosition="50"
+                app:keyPositionType="parentRelative"
+                app:motionTarget="@id/player"
+                app:percentX="0.1"
+                app:percentY="0.5" />
+
+            <KeyAttribute
+                android:elevation="0dp"
+                app:framePosition="30"
+                app:motionTarget="@id/player" />
+
+            <KeyAttribute
+                android:elevation="0dp"
+                app:framePosition="90"
+                app:motionTarget="@id/player" />
+            <KeyAttribute
+                android:elevation="6dp"
+                app:framePosition="100"
+                app:motionTarget="@id/player" />
+
+            <KeyAttribute
+                android:translationY="100dp"
+                app:framePosition="30"
+                app:motionTarget="@id/channel_info_view" />
+
+            <KeyAttribute
+                android:translationY="250dp"
+                app:framePosition="100"
+                app:motionTarget="@id/channel_info_view" />
+
+            <KeyAttribute
+                android:alpha="1"
+                app:framePosition="0"
+                app:motionTarget="@id/chatScrollNotificationText" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="30"
+                app:motionTarget="@id/chatScrollNotificationText" />
+            <KeyAttribute
+                android:alpha="0"
+                app:framePosition="100"
+                app:motionTarget="@id/chatScrollNotificationText" />
+            <KeyAttribute
+                android:elevation="0dp"
+                app:framePosition="30"
+                app:motionTarget="@id/video_progress_bar" />
+
+            <KeyAttribute
+                android:elevation="0dp"
+                app:framePosition="90"
+                app:motionTarget="@id/video_progress_bar" />
+            <KeyAttribute
+                android:elevation="7dp"
+                app:framePosition="100"
+                app:motionTarget="@id/video_progress_bar" />
+
+            <KeyAttribute
+                android:alpha="0"
+                android:translationY="700dp"
+                app:framePosition="100"
+                app:motionTarget="@id/emoticon_picker" />
+        </KeyFrameSet>
+    </Transition>
+
+    <Transition
+        android:id="@+id/slide_transition"
+        app:constraintSetEnd="@id/slide"
+        app:constraintSetStart="@id/end">
+
+        <KeyFrameSet>
+            <KeyAttribute
+                android:scaleY="2"
+                android:translationX="0dp"
+                app:framePosition="0"
+                app:motionTarget="@id/player" />
+
+            <KeyAttribute
+                android:translationX="200dp"
+                app:framePosition="100"
+                app:motionTarget="@id/player" />
+        </KeyFrameSet>
+    </Transition>
+
+
+    <ConstraintSet
+        android:id="@+id/start"
+        app:transitionEasing="standard">
+        <Constraint android:id="@id/chatScrollNotificationText">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint
+            android:id="@+id/settings_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint
+            android:id="@+id/player"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:controller_layout_id="@layout/live_stream_layout"
+            app:layout_constraintBottom_toTopOf="@id/channel_info_view"
+            app:layout_constraintEnd_toStartOf="@id/chat"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shutter_background_color="@android:color/black">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint
+            android:id="@+id/chat"
+            android:layout_width="200dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/chatInputLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+
+        <Constraint
+            android:id="@id/channel_info_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/emoticon_picker"
+            app:layout_constraintEnd_toStartOf="@id/chat"
+            app:layout_constraintStart_toStartOf="parent"
+            app:pathMotionArc="startVertical">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+
+        <Constraint
+            android:id="@id/chatInputLayout"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/emoticon_picker"
+            app:layout_constraintEnd_toEndOf="@id/chat">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+
+        <Constraint
+            android:id="@+id/emoticon_picker"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+
+        <Constraint android:id="@id/video_progress_bar">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+    </ConstraintSet>
+
+
+    <ConstraintSet android:id="@+id/end">
+        <Constraint android:id="@id/chatScrollNotificationText">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint
+            android:id="@+id/settings_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint
+            android:id="@+id/player"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="75dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint
+            android:id="@id/channel_info_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/chat"
+            app:layout_constraintStart_toStartOf="parent"
+            app:pathMotionArc="startVertical">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint
+            android:id="@+id/chat"
+            android:layout_width="200dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/chatInputLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+
+
+        <Constraint
+            android:id="@id/chatInputLayout"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/chat">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+
+        <Constraint android:id="@id/video_progress_bar">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+    </ConstraintSet>
+
+
+    <ConstraintSet android:id="@+id/slide">
+        <Constraint android:id="@id/chatScrollNotificationText">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint
+            android:id="@+id/settings_scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint
+            android:id="@+id/player"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="75dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint
+            android:id="@id/channel_info_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/chat"
+            app:layout_constraintStart_toStartOf="parent"
+            app:pathMotionArc="startVertical">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint
+            android:id="@+id/chat"
+            android:layout_width="200dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@id/chatInputLayout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+        <Constraint android:id="@id/video_progress_bar">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+
+        <Constraint
+            android:id="@id/chatInputLayout"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/chat">
+            <PropertySet app:visibilityMode="ignore" />
+        </Constraint>
+    </ConstraintSet>
+</MotionScene>

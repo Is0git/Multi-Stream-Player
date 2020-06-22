@@ -1,2 +1,5 @@
 include ':app', ':multistreamplayer'
+include ':multistreamchat'
+project(':multistreamchat').projectDir=new File('D:\\multistreamProjectWorking\\Multi-Stream-Chat\\multistreamchat')
+
 rootProject.name='LiveStreamVideoPlayer'

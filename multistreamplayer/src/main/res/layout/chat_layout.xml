@@ -1,49 +1,11 @@
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:layout_height="wrap_content">
-
-            <com.android.multistreamplayer.ui.BadgeView
-                android:id="@+id/badge"
-                android:layout_width="25dp"
-                android:layout_height="0dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@id/user"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.02"
-                app:layout_constraintStart_toEndOf="@+id/user"
-                app:layout_constraintTop_toTopOf="@id/user"
-                app:size="25dp" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/user"
-                style="@style/TextAppearance.MaterialComponents.Body2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:shadowColor="@color/colorOnSurface"
-                android:shadowDy="2"
-                android:shadowRadius="4"
-                android:text="@string/hellso"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/text"
                 style="@style/TextAppearance.MaterialComponents.Caption"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/hello"
                 android:textStyle="bold"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="@id/user"
-                app:layout_constraintTop_toBottomOf="@id/user" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:layout_marginEnd="16dp" />
 </layout>

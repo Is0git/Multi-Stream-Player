@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="topItemShape" parent="">
-        <item name="android:topRightRadius">10dp</item>
-        <item name="android:topLeftRadius">10dp</item>
-        <item name="android:bottomLeftRadius">0dp</item>
-        <item name="android:bottomRightRadius">0dp</item>
 
-    </style>
     <style name="ChatTextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/colorOnPrimaryVariant</item>
         <item name="boxStrokeWidth">2dp</item>
+        <item name="materialThemeOverlay">@style/MyThemeOverlayOutlinedDense</item>
+    </style>
+
+    <style name="MyThemeOverlayOutlinedDense">
+        <item name="editTextStyle">@style/MyTextInputEditText_outlinedBox_dense_h
+        </item>
+    </style>
+
+    <style name="MyTextInputEditText_outlinedBox_dense_h" parent="@style/Widget.MaterialComponents.TextInputEditText.OutlinedBox.Dense">
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
     </style>
 </resources>

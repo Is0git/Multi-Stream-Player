@@ -3,7 +3,6 @@ package com.android.livestreamvideoplayer
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import com.android.livestreamvideoplayer.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -14,7 +13,7 @@ class MainActivity : AppCompatActivity() {
             setContentView(R.layout.activity_main)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.motionLayout.setDefaultTransitionHandler(supportFragmentManager)
-        supportFragmentManager.beginTransaction().replace(R.id.player_fragment, PlayerFragment()).commit()
-    }
+        supportFragmentManager.beginTransaction().replace(R.id.player_fragment, PlayerFragment(), "player_fragment").commit()
 
+    }
 }

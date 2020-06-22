@@ -3,5 +3,21 @@
     <string name="quality">QUALITY</string>
     <string name="send">SEND</string>
     <string name="hello">HELLO</string>
-    <string name="hellso">HELLsO</string>
+    <string name="connection_establised_message">You are connected to %s chat</string>
+    <string name="connection_failed_message">You are disconnected from %s chat</string>
+    <string name="items_below">More messages below</string>
+    <string name="global_emote">Global Emotes</string>
+    <string name="vod_chat_not_available">VOD chat is not available at the moment</string>
+    <string name="chat_enabled">chat enabled</string>
+    <string name="message">message</string>
+    <string name="followers_only_description">You have to follow this channel at least for <![CDATA[ <b>%d</b> minutes]]></string>
+    <string name="emote_only_description">If enabled, only emotes allowed in chat</string>
+    <string name="r9k_mode_description">R9K mode. If enabled, messages with more than 9 characters must be unique.</string>
+    <string name="slow_mode_description">The number of seconds <![CDATA[ <b>(%d)</b> a chatter without moderator privileges must wait between sending messages.]]></string>
+    <string name="sub_only_description">Subscribers-only mode. If enabled, only subscribers and moderators can chat</string>
+    <string name="followers_only">followers-only chat enabled</string>
+    <string name="emote_only">emote-only chat enabled</string>
+    <string name="r9k_mode">r9k-mode is enabled</string>
+    <string name="slow_mode">slow-mode is enabled</string>
+    <string name="sub_only">sub-only mode is enabled</string>
 </resources>

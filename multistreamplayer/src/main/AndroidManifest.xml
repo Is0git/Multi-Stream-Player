@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.multistreamplayer">
+    package="com.iso.player">
     <application>
-        <service android:name=".alarm.AlarmService"/>
+        <service android:name="com.iso.player.alarm.AlarmService"/>
     </application>
 </manifest>

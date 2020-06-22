@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/emote_search_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/emotes_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        app:layout_constraintEnd_toEndOf="@id/emote_search_bar"
+        app:layout_constraintStart_toStartOf="@id/emote_search_bar"
+        app:tabGravity="start"
+        app:layout_constraintBottom_toTopOf="@id/emote_search_bar"/>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/emotes_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+       app:layout_constraintBottom_toTopOf="@id/emotes_tab_layout"
+        app:layout_constraintEnd_toEndOf="@id/emotes_tab_layout"
+        app:layout_constraintStart_toStartOf="@id/emotes_tab_layout"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/emotes_viewpager"
+        app:layout_constraintEnd_toEndOf="@+id/emotes_viewpager"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/emotes_viewpager" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
